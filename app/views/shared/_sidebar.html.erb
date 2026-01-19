@@ -1,0 +1,45 @@
+<div class="sidebar vh-100 p-3" style="width: 280px;">
+  <h3 class="text-primary fw-bold">CIS Life</h3>
+  <hr>
+
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <%= link_to "Dashboard", authenticated_root_path, class: "nav-link" %>
+    </li>
+
+    <li class="nav-item mt-3">
+      <span class="text-secondary fw-bold">Insurance</span>
+      <ul class="nav flex-column ms-3">
+        <li class="nav-item"><%= link_to "Agreements", agreement_contracts_path, class: "nav-link" %></li>
+        <li class="nav-item"><%= link_to "Products", insurance_products_path, class: "nav-link" %></li>
+        <li class="nav-item"><%= link_to "Group Contracts", insurance_groups_path, class: "nav-link" %></li>
+        <li class="nav-item"><%= link_to "Group Assessments", insurance_groups_path, class: "nav-link" %></li>
+      </ul>
+    </li>
+
+    <li class="nav-item mt-3">
+      <span class="text-secondary fw-bold">Cooperative</span>
+      <ul class="nav flex-column ms-3">
+        <li class="nav-item"><%= link_to "Cooperative", cooperatives_path, class: "nav-link" %></li>
+        <li class="nav-item"><%= link_to "Memberships", coop_memberships_path, class: "nav-link" %></li>
+      </ul>
+    </li>
+
+    <li class="nav-item mt-3">
+      <span class="text-secondary fw-bold">Users</span>
+      <ul class="nav flex-column ms-3">
+        <li class="nav-item"><%= link_to "Producers", individuals_path, class: "nav-link" %></li>
+        <li class="nav-item"><%= link_to "Roles", individuals_path, class: "nav-link" %></li>
+      </ul>
+    </li>
+
+    <li class="nav-item mt-3">
+      <span class="text-secondary fw-bold">Management</span>
+      <ul class="nav flex-column ms-3">
+        <li class="nav-item"><%= link_to "Individuals", individuals_path, class: "nav-link" %></li>
+        <li class="nav-item"><%= link_to "Branches", individuals_path, class: "nav-link" %></li>
+        <li class="nav-item"><%= link_to "Departments", individuals_path, class: "nav-link" %></li>
+      </ul>
+    </li>
+  </ul>
+</div>

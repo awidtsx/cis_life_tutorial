@@ -15,7 +15,24 @@
     
   </head>
 
-  <body>
+ <body>
+  <% if controller_name == "auth" && action_name == "index" %>
     <%= yield %>
-  </body>
+  <% else %>
+  <% unless devise_controller? %>
+
+    <div class="d-flex">
+      <%= render "shared/sidebar" %>
+
+      <div class="flex-grow-1">
+        <%= render "shared/header" %>
+        <div class="container-fluid mt-4">
+          <%= yield %>
+        </div>
+      </div>
+    </div>
+    <% end %>
+  <% end %>
+</body>
+
 </html>

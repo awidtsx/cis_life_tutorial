@@ -1,0 +1,58 @@
+<div class="container min-vh-100 d-flex align-items-center">
+  <div class="row justify-content-center w-100">
+    <div class="col-lg-10">
+      <div class="card shadow border-0 p-4">
+
+        <div class="text-center mb-4">
+          <h1 class="fw-bold text-primary">CIS Life</h1>
+          <div class="mx-auto mt-2" style="width: 80px; height: 4px; background:#F9CB25;"></div>
+        </div>
+
+        <div class="row g-5">
+          <!-- LOGIN -->
+          <div class="col-md-6">
+            <h4 class="mb-3">Login</h4>
+
+            <%= form_with url: user_session_path, scope: :user, local: true, data: { turbo: false } do |f| %>
+  <div class="mb-3">
+    <%= f.email_field :email, class: "form-control", placeholder: "Email", autofocus: true, required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.password_field :password, class: "form-control", placeholder: "Password", required: true %>
+  </div>
+
+  <%= f.submit "Login", class: "btn btn-primary w-100" %>
+<% end %>
+
+
+          </div>
+
+          <!-- REGISTRATION -->
+          <div class="col-md-6 border-start">
+            <h4 class="mb-3 text-secondary">Register</h4>
+
+            <%= form_with url: user_registration_path, scope: :user, local: true, data: { turbo: false } do |f| %>
+  <div class="mb-3">
+    <%= f.email_field :email, class: "form-control", placeholder: "Email", required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.password_field :password, class: "form-control", placeholder: "Password", required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.password_field :password_confirmation, class: "form-control", placeholder: "Confirm Password", required: true %>
+  </div>
+
+  <%= f.submit "Register", class: "btn btn-register w-100" %>
+<% end %>
+
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

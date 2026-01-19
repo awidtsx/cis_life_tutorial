@@ -1,0 +1,154 @@
+<div class="dashboard-container">
+
+  <!-- USER INFO CARD -->
+  <div class="card user-info-card mb-4">
+    <div class="card-body">
+      <div class="row">
+
+        <!-- Left side user details -->
+        <div class="col-md-8">
+          <h4 class="mb-3">User Information</h4>
+          <p><strong>Username:</strong> Placeholder Username</p>
+          <p><strong>Email:</strong> <%= current_user.email %></p>
+          <p><strong>Gender:</strong> Placeholder Gender</p>
+          <p><strong>Birthday:</strong> Placeholder Birthday</p>
+        </div>
+
+        <!-- Right side organizational details -->
+        <div class="col-md-4">
+          <div class="card org-card">
+            <div class="card-body">
+              <h5>Organization Details</h5>
+              <p><strong>Organization Type:</strong> Placeholder Org Type</p>
+              <p><strong>Last Signed In:</strong> Placeholder Last Sign-in</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- STAT CARDS -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="stat-card stat-primary">
+        <p class="stat-title">Sign-in Count</p>
+        <h2 class="stat-number">Placeholder</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card stat-dark">
+        <p class="stat-title">Account Age</p>
+        <h2 class="stat-number">Placeholder</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card stat-primary">
+        <p class="stat-title">Role Level</p>
+        <h2 class="stat-number">Placeholder</h2>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card stat-dark">
+        <p class="stat-title">Status</p>
+        <h2 class="stat-number">Placeholder</h2>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- CERTIFICATE OVERVIEW -->
+  <div class="card certificate-card mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h4>Certificate Overview</h4>
+          <p>Quick summary of all insurance certificates</p>
+        </div>
+
+        <button class="btn btn-view">View All Certificates</button>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-md-3">
+          <p class="cert-label">Total Certificate</p>
+          <h3 class="cert-number cert-primary">Placeholder</h3>
+        </div>
+        <div class="col-md-3">
+          <p class="cert-label">Active</p>
+          <h3 class="cert-number cert-dark">Placeholder</h3>
+        </div>
+        <div class="col-md-3">
+          <p class="cert-label">Total Sum Assured</p>
+          <h3 class="cert-number cert-primary">Placeholder</h3>
+        </div>
+        <div class="col-md-3">
+          <p class="cert-label">Total Premium</p>
+          <h3 class="cert-number cert-dark">Placeholder</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SYSTEM MODULES -->
+  <div class="card system-card">
+    <div class="card-body">
+      <h4>System Modules</h4>
+      <p>Access all system modules and data management pages.</p>
+
+      <div class="row mt-4">
+
+        <!-- Row 1 -->
+        <%= render "system_module_card", title: "Certificates", category: "Insurance" %>
+        <%= render "system_module_card", title: "Group Contracts", category: "Insurance" %>
+        <%= render "system_module_card", title: "Perils", category: "Insurance" %>
+
+        <!-- Row 2 -->
+        <%= render "system_module_card", title: "Products", category: "Insurance" %>
+        <%= render "system_module_card", title: "Contracts", category: "Agreement" %>
+        <%= render "system_module_card", title: "Coverages", category: "Agreement" %>
+
+        <!-- Row 3 -->
+        <%= render "system_module_card", title: "Eligibilities", category: "Agreement" %>
+        <%= render "system_module_card", title: "Relationships", category: "Agreement" %>
+        <%= render "system_module_card", title: "Rates", category: "Agreement" %>
+
+        <!-- Row 4 -->
+        <%= render "system_module_card", title: "Producers", category: "User Management" %>
+        <%= render "system_module_card", title: "Permissions", category: "User Management" %>
+        <%= render "system_module_card", title: "Roles", category: "User Management" %>
+
+        <!-- Row 5 -->
+        <%= render "system_module_card", title: "Resources", category: "User Management" %>
+        <%= render "system_module_card", title: "Regions", category: "Address" %>
+        <%= render "system_module_card", title: "Provinces", category: "Address" %>
+
+        <!-- Row 6 -->
+        <%= render "system_module_card", title: "Municipalities", category: "Address" %>
+        <%= render "system_module_card", title: "Barangays", category: "Address" %>
+        <%= render "system_module_card", title: "Registries", category: "Cooperative" %>
+
+        <!-- Row 7 -->
+        <%= render "system_module_card", title: "Branches", category: "Cooperative" %>
+        <%= render "system_module_card", title: "Memberships", category: "Cooperative" %>
+        <%= render "system_module_card", title: "Employees", category: "Cooperative" %>
+
+        <!-- Row 8 -->
+        <%= render "system_module_card", title: "Types", category: "Cooperative" %>
+        <%= render "system_module_card", title: "Individuals", category: "General" %>
+        <%= render "system_module_card", title: "Dependents", category: "General" %>
+
+        <!-- Row 9 -->
+        <%= render "system_module_card", title: "Relationship Types", category: "General" %>
+        <%= render "system_module_card", title: "Departments", category: "General" %>
+        <%= render "system_module_card", title: "Branch Territories", category: "General" %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get 'dashboard/index'
+  get "/dashboard", to: "dashboard#index"
+  get 'auth/index'
   resources :insurance_groups
   resources :insurance_contracts
   resources :coop_memberships do
@@ -31,7 +34,14 @@ end
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
-  root "cooperatives#index"
+  authenticated :user do
+  root to: "dashboard#index", as: :authenticated_root
+end
+
+unauthenticated do
+  root to: "auth#index", as: :unauthenticated_root
+end
+
   # Defines the root path route ("/")
   # root "posts#index"
 end

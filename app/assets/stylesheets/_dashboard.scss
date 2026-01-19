@@ -1,0 +1,103 @@
+.dashboard-container {
+  padding: 1rem;
+}
+
+/* User Card */
+.user-info-card {
+  background: #FDFDFD;
+  border: 1px solid #CCCCCC;
+}
+
+.org-card {
+  background: #FDFDFD;
+  border: 1px solid #CCCCCC;
+}
+
+/* Stat Cards */
+.stat-card {
+  padding: 1.2rem;
+  border-radius: 10px;
+  color: white;
+}
+
+.stat-primary {
+  background: #002C88;
+}
+
+.stat-dark {
+  background: #031249;
+}
+
+.stat-title {
+  font-weight: bold;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+/* Certificate Overview */
+.certificate-card {
+  border: 1px solid #CCCCCC;
+}
+
+.btn-view {
+  background: #002C88;
+  color: #FDFDFD;
+  border: none;
+}
+
+.btn-view:hover {
+  background: #031249;
+}
+
+.cert-label {
+  color: #031249;
+}
+
+.cert-number {
+  font-weight: bold;
+}
+
+.cert-primary {
+  color: #002C88;
+}
+
+.cert-dark {
+  color: #031249;
+}
+
+/* System Modules */
+.module-card {
+  border: 1px solid #CCCCCC;
+  border-radius: 10px;
+}
+
+.module-header {
+  padding: 0.8rem;
+  color: white;
+  font-weight: bold;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.header-primary {
+  background: #002C88;
+}
+
+.header-dark {
+  background: #031249;
+}
+
+.module-body {
+  padding: 1rem;
+}
+
+.module-category {
+  font-weight: bold;
+}
+
+.module-description {
+  color: #031249;
+}

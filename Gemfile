@@ -23,7 +23,10 @@ gem "turbo-rails"
 
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
-
+  gem "web-console"
+  gem "ruby-lsp"  # For Ruby LSP in VS Code
+  gem "solargraph" # For code intelligence and autocompletion
+gem 'simple_form'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 

@@ -1,0 +1,81 @@
+/* Auth Page Layout */
+.auth-container {
+  min-height: 100vh;
+  background: #FDFDFD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 1100px;
+  background: #FDFDFD;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.app-title {
+  color: #002C88;
+  font-weight: bold;
+}
+
+.brand-divider {
+  width: 120px;
+  height: 4px;
+  background: #F9CB25;
+  border: none;
+  margin: auto;
+}
+
+/* Inputs */
+.brand-input {
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
+  padding: 0.6rem;
+  color: #031249;
+}
+
+.brand-input:focus {
+  outline: none;
+  border-color: #002C88;
+  box-shadow: 0 0 0 0.2rem rgba(0, 44, 136, 0.2);
+}
+
+/* Buttons */
+.btn-primary {
+  background: #002C88 !important;
+  border: none !important;
+  color: #FDFDFD !important;
+}
+
+.btn-secondary {
+  background: #F9CB25 !important;
+  border: none !important;
+  color: #031249 !important;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  filter: brightness(0.9);
+}
+
+/* Sidebar + Header colors (brand) */
+.sidebar {
+  background: #FDFDFD;
+}
+
+.header {
+  background: #FDFDFD;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+.nav-link {
+  color: #031249 !important;
+}
+
+.nav-link:hover {
+  background: #CCCCCC !important;
+  color: #031249 !important;
+}

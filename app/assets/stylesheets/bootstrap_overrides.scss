@@ -1,0 +1,18 @@
+$primary:   #002C88;
+$secondary:#F9CB25;
+
+$body-bg:  #FDFDFD;
+$body-color:#031249;
+
+$border-color: #CCCCCC;
+
+.btn-tertiary {
+  background-color: #A80F21;
+  color: #FDFDFD;
+  border: none;
+}
+
+.btn-tertiary:hover {
+  background-color: darken(#A80F21, 8%);
+  color: #FDFDFD;
+}
