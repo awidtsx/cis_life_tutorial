@@ -1,0 +1,30 @@
+<h1>New insurance product</h1>
+
+<%= form_with(model: @insurance_product, local: true) do |f| %>
+
+  <div class="mb-3">
+    <%= f.label :name, class: "form-label" %>
+    <%= f.text_field :name, autofocus: true, class: "form-control", required: true %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :description, class: "form-label" %>
+    <%= f.text_field :description, autofocus: true, class: "form-control", required: true %>
+  </div>
+  <div class="field">
+  <%= f.label :product_type, "Product Type" %>
+  <%= f.select :product_type,
+        InsuranceProduct.product_types.values,
+        { prompt: "Select product type" },
+        class: "tom-select" %>
+  </div>
+  <%= f.submit class: "btn btn-primary" %>
+
+
+
+<% end %>
+
+<br>
+
+<div>
+  <%= link_to "Back to insurance products", insurance_products_path %>
+</div>

@@ -1,0 +1,48 @@
+<h1>New rate</h1>
+
+
+<%= form_with(model: @agreement_rate, local: true) do |f| %>
+
+<div class="field">
+  <%= f.label :contract_id, "Contract" %>   
+  <%= f.select :contract_id,
+        options_from_collection_for_select(@agreement_contracts, :id, :id, @agreement_rate.contract_id),
+        { prompt: "Select a contract" },
+        { id: "contract_select", class: "tom-select" } %>
+</div>
+
+<div class="field">
+  <%= f.label :age_from, "Age from" %>
+  <%= f.number_field :age_from, class: "form-control", step: 1, min: 0 %>
+</div>
+
+<div class="field">
+  <%= f.label :age_to, "Age to" %>
+  <%= f.number_field :age_to, class: "form-control", step: 1, min: 0 %>
+</div>
+
+<div class="field">
+  <%= f.label :rate, "Rate" %>
+  <%= f.number_field :rate, class: "form-control", step: 0.01, min: 0 %>
+</div>
+
+<div class="field">
+  <%= f.label :min_amount, "Minimum amount" %>
+  <%= f.number_field :min_amount, class: "form-control", step: 0.01, min: 0 %>
+</div>
+
+<div class="field">
+  <%= f.label :max_amount, "Maximum amount" %>
+  <%= f.number_field :max_amount, class: "form-control", step: 0.01, min: 0 %>
+</div>
+
+  <%= f.submit class: "btn btn-primary" %>
+
+<% end %>
+
+
+<br>
+
+<div>
+  <%= link_to "Back to rates", agreement_rates_path %>
+</div>

@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Rates</h1>
+
+<div id="agreement_rates">
+  <% @agreement_rates.each do |agreement_rate| %>
+    <%= render agreement_rate %>
+    <p>
+      <%= link_to "Show this rate", agreement_rate %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New rate", new_agreement_rate_path %>

@@ -1,0 +1,42 @@
+<%= form_with(model: cooperative) do |form| %>
+  <% if cooperative.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(cooperative.errors.count, "error") %> prohibited this cooperative from being saved:</h2>
+
+      <ul>
+        <% cooperative.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :add_region_id, style: "display: block" %>
+    <%= form.text_field :add_region_id %>
+  </div>
+
+  <div>
+    <%= form.label :add_province_id, style: "display: block" %>
+    <%= form.text_field :add_province_id %>
+  </div>
+
+  <div>
+    <%= form.label :add_municipal_id, style: "display: block" %>
+    <%= form.text_field :add_municipal_id %>
+  </div>
+
+  <div>
+    <%= form.label :add_barangay_id, style: "display: block" %>
+    <%= form.text_field :add_barangay_id %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

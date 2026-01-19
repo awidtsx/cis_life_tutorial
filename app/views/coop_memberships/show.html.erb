@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+  <% @coop_memberships.each do |coop_membership| %>
+    <strong>Cooperative:</strong> <%= coop_membership.cooperative&.name %><br>
+    <strong>Indivudual:</strong> <%= coop_membership.individual&.full_name %><br>
+    <strong>Membership Type:</strong> <%= coop_membership.membership_date %><br>
+  <% end %>
+
+<div>
+  <%= link_to "Edit this coop membership", edit_coop_membership_path(@coop_membership) %> |
+  <%= link_to "Back to coop memberships", coop_memberships_path %>
+  <%= link_to "Add Insurance Contract", new_coop_membership_insurance_contract_path(@coop_membership) %>
+  <%= button_to "Destroy this coop membership", @coop_membership, method: :delete %>
+</div>

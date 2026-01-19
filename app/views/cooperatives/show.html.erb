@@ -1,0 +1,22 @@
+<p style="color: green"><%= notice %></p>
+  <% @cooperatives.each do |cooperative| %>
+    <h3><%= cooperative.name %></h2>
+    <strong>Region:</strong>
+    <%= cooperative.region.name %>
+    <br>
+    <strong>Province:</strong>
+    <%= cooperative.province.name %>
+    <br>
+    <strong>Municipal:</strong>
+    <%= cooperative.municipal.name %>
+    <br>
+    <strong>Barangay:</strong>
+    <%= cooperative.barangay.name %>
+    <br>
+  <% end %>
+<div>
+  <%= link_to "Edit this cooperative", edit_cooperative_path(@cooperative) %> |
+  <%= link_to "Back to cooperatives", cooperatives_path %>
+
+  <%= button_to "Destroy this cooperative", @cooperative, method: :delete %>
+</div>

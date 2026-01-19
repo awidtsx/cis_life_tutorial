@@ -1,0 +1,49 @@
+<h1>New cooperative</h1>
+
+<%= form_with(model: @cooperative, local: true) do |f| %>
+
+  <div class="mb-3">
+    <%= f.label :name, class: "form-label" %>
+    <%= f.text_field :name, autofocus: true, class: "form-control", required: true %>
+  </div>
+
+
+<div class="field">
+  <%= f.label :add_region_id, "Region" %>
+  <%= f.select :add_region_id,
+        options_from_collection_for_select(@regions, :id, :name, @cooperative.add_region_id),
+        { prompt: "Select a region" },
+        { id: "region_select", class: "tom-select" } %>
+</div>
+
+<div class="field">
+  <%= f.label :add_province_id, "Province" %>
+  <%= f.select :add_province_id,
+        options_from_collection_for_select(@provinces, :id, :name, @cooperative.add_province_id),
+        { prompt: "Select a province" },
+        { id: "province_select", class: "tom-select" } %>
+</div>
+
+<div class="field">
+  <%= f.label :add_municipal_id, "Municipal" %>
+  <%= f.select :add_municipal_id,
+        options_from_collection_for_select(@municipals, :id, :name, @cooperative.add_municipal_id),
+        { prompt: "Select a municipal" },
+        { id: "municipal_select", class: "tom-select" } %>
+</div>
+
+<div class="field">
+  <%= f.label :add_barangay_id, "Barangay" %>
+  <%= f.select :add_barangay_id,
+        options_from_collection_for_select(@barangays, :id, :name, @cooperative.add_barangay_id),
+        { prompt: "Select a barangay" },
+        { id: "barangay_select", class: "tom-select" } %>
+</div>
+
+  <%= f.submit class: "btn btn-primary" %>
+
+<% end %>
+
+<div>
+  <%= link_to "Back to cooperatives", cooperatives_path %>
+</div>

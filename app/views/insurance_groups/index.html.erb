@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Insurance groups</h1>
+
+<div id="insurance_groups">
+  <% @insurance_groups.each do |insurance_group| %>
+    <%= render insurance_group %>
+    <p>
+      <%= link_to "Show this insurance group", insurance_group %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New insurance group", new_insurance_group_path %>

@@ -1,0 +1,26 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Cooperatives</h1>
+
+<div id="cooperatives">
+  <% @cooperatives.each do |cooperative| %>
+    <h3><%= cooperative.name %></h2>
+    <strong>Region:</strong>
+    <%= cooperative.region.name %>
+    <br>
+    <strong>Province:</strong>
+    <%= cooperative.province.name %>
+    <br>
+    <strong>Municipal:</strong>
+    <%= cooperative.municipal.name %>
+    <br>
+    <strong>Barangay:</strong>
+    <%= cooperative.barangay.name %>
+    <br>
+    <p>
+      <%= link_to "Show this cooperative", cooperative %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New cooperative", new_cooperative_path %>

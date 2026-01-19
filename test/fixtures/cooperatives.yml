@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  add_region: one
+  add_province: one
+  add_municipal: one
+  add_barangay: one
+
+two:
+  name: MyString
+  add_region: two
+  add_province: two
+  add_municipal: two
+  add_barangay: two

@@ -1,0 +1,15 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Coop memberships</h1>
+
+<div id="coop_memberships">
+  <% @coop_memberships.each do |coop_membership| %>
+    <strong>Cooperative:</strong> <%= coop_membership.cooperative&.name %><br>
+    <strong>Indivudual:</strong> <%= coop_membership.individual&.full_name %><br>
+    <p>
+      <%= link_to "Show this coop membership", coop_membership %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New coop membership", new_coop_membership_path %>

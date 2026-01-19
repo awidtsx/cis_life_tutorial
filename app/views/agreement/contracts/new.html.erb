@@ -1,0 +1,28 @@
+<h1>New contract</h1>
+
+<%= form_with(model: @agreement_contract, local: true) do |f| %>
+
+<div class="field">
+  <%= f.label :cooperative_id, "Cooperative" %>
+  <%= f.select :cooperative_id,
+        options_from_collection_for_select(@cooperatives, :id, :name, @agreement_contract.cooperative_id),
+        { prompt: "Select a cooperative" },
+        { id: "cooperative_select", class: "tom-select" } %>
+</div>
+
+<div class="field">
+  <%= f.label :insurance_product_id, "Product" %>
+  <%= f.select :insurance_product_id,
+        options_from_collection_for_select(@products, :id, :name, @agreement_contract.insurance_product_id),
+        { prompt: "Select a product" },
+        { id: "product_select", class: "tom-select" } %>
+</div>
+
+  <%= f.submit class: "btn btn-primary" %>
+
+<% end %>
+<br>
+
+<div>
+  <%= link_to "Back to contracts", agreement_contracts_path %>
+</div>

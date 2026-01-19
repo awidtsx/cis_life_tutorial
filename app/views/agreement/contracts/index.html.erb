@@ -1,0 +1,15 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Contracts</h1>
+
+<div id="agreement_contracts">
+  <% @agreement_contracts.each do |agreement_contract| %>
+    <strong>Cooperative:</strong> <%= agreement_contract.cooperative&.name %><br>
+    <strong>Insurance Product:</strong> <%= agreement_contract.insurance_product&.name %><br>
+    <p>
+      <%= link_to "Show this coop membership", agreement_contract %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New contract", new_agreement_contract_path %>

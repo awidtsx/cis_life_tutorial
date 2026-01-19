@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @agreement_rate %>
+
+<div>
+  <%= link_to "Edit this rate", edit_agreement_rate_path(@agreement_rate) %> |
+  <%= link_to "Back to rates", agreement_rates_path %>
+
+  <%= button_to "Destroy this rate", @agreement_rate, method: :delete %>
+</div>

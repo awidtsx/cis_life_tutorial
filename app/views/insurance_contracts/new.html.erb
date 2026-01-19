@@ -1,0 +1,50 @@
+<h1>New insurance contract</h1>
+
+<div data-controller="premium">
+<%= form_with(model: [@insured, @insurance_contract], local: true) do |f| %>
+
+
+  <div class="mb-3">
+    <%= f.label :age, class: "form-label" %>
+    <%= f.number_field :age, autofocus: true, class: "form-control", required: true, step: 1, min: 0 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :rate_id, "Rate" %>   
+    <%= f.select :rate_id,
+          options_from_collection_for_select(@agreement_rates, :id, :rate, @insurance_contract.rate_id),
+          { prompt: "Select a rate" },
+          { id: "rate_select", class: "tom-select", data: { premium_target: "rate", action: "change->premium#recalculate" } } %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :amount_covered, class: "form-label" %>
+    <%= f.number_field :amount_covered, autofocus: true, class: "form-control", required: true, step: 0.01, min: 0, data: { premium_target: "amount", action: "input->premium#recalculate" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :premium, "Premium" %>
+    <p data-premium-target="premiumPreview">
+      <%= number_to_currency(@insurance_contract.premium) %>
+    </p>
+    <%= f.hidden_field :premium, data: { premium_target: "premiumInput" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :effectivity, class: "form-label" %>
+    <%= f.date_field :effectivity, data: { premium_target: "effectivity", action: "change->premium#recalculate" }, autofocus: true, class: "form-control", required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :expiry, class: "form-label" %>
+    <%= f.date_field :expiry, data: { premium_target: "expiry", action: "change->premium#recalculate" }, autofocus: true, class: "form-control", required: true %>
+  </div>
+
+  <%= f.submit class: "btn btn-primary" %>
+<% end %>
+</div>
+
+<br>
+<div>
+  <%= link_to "Back to insurance contracts", polymorphic_path([@insured, :insurance_contracts]) %>
+</div>

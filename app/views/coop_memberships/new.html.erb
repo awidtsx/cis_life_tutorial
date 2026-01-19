@@ -1,0 +1,33 @@
+<h1>New coop membership</h1>
+
+<%= form_with(model: @coop_membership, local: true) do |f| %>
+
+<div class="field">
+  <%= f.label :cooperative_id, "Cooperative" %>
+  <%= f.select :cooperative_id,
+        options_from_collection_for_select(@cooperatives, :id, :name, @coop_membership.cooperative_id),
+        { prompt: "Select a cooperative" },
+        { id: "cooperative_select", class: "tom-select" } %>
+</div>
+
+<div class="field">
+  <%= f.label :individual_id, "Individual" %>
+  <%= f.select :individual_id,
+        options_from_collection_for_select(@individuals, :id, :full_name, @coop_membership.individual_id),
+        { prompt: "Select a individual" },
+        { id: "individual_select", class: "tom-select" } %>
+</div>
+
+<div class="field">
+  <%= f.label :membership_date, "Membership Date" %>
+  <%= f.date_field :membership_date, class: "form-control" %>
+</div>
+
+  <%= f.submit class: "btn btn-primary" %>
+
+<% end %>
+<br>
+
+<div>
+  <%= link_to "Back to coop memberships", coop_memberships_path %>
+</div>

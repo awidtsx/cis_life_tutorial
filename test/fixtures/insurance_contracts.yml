@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  rate: one
+  insured: one
+  insured_type: Insured
+  age: 1
+  amount_covered: 9.99
+  premium: MyString
+  effectivity: 2026-01-12
+  expiry: 2026-01-12
+
+two:
+  rate: two
+  insured: two
+  insured_type: Insured
+  age: 1
+  amount_covered: 9.99
+  premium: MyString
+  effectivity: 2026-01-12
+  expiry: 2026-01-12

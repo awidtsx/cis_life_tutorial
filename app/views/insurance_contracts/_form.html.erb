@@ -1,0 +1,52 @@
+<%= form_with(model: insurance_contract) do |form| %>
+  <% if insurance_contract.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(insurance_contract.errors.count, "error") %> prohibited this insurance_contract from being saved:</h2>
+
+      <ul>
+        <% insurance_contract.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :rate_id, style: "display: block" %>
+    <%= form.text_field :rate_id %>
+  </div>
+
+  <div>
+    <%= form.label :insured_id, style: "display: block" %>
+    <%= form.text_field :insured_id %>
+  </div>
+
+  <div>
+    <%= form.label :age, style: "display: block" %>
+    <%= form.number_field :age %>
+  </div>
+
+  <div>
+    <%= form.label :amount_covered, style: "display: block" %>
+    <%= form.text_field :amount_covered %>
+  </div>
+
+  <div>
+    <%= form.label :premium, style: "display: block" %>
+    <%= form.text_field :premium %>
+  </div>
+
+  <div>
+    <%= form.label :effectivity, style: "display: block" %>
+    <%= form.date_field :effectivity %>
+  </div>
+
+  <div>
+    <%= form.label :expiry, style: "display: block" %>
+    <%= form.date_field :expiry %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

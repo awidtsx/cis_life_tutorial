@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  insurance_contract: one
+  cooperative: one
+  contract: one
+
+two:
+  insurance_contract: two
+  cooperative: two
+  contract: two
