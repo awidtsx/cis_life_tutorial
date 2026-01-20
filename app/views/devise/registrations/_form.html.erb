@@ -1,15 +1,15 @@
-<%= form_with url: user_registration_path, scope: :user, local: true, data: { turbo: false } do |f| %>
+<%= form_for(resource, as: :user, url: registration_path(:user)) do |f| %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+  
+  <div class="mb-3"> 
+    <%= f.email_field :email, class: "form-control", placeholder: "Email", required: true %> 
+  </div> 
   <div class="mb-3">
-    <%= f.email_field :email, class: "form-control", placeholder: "Email", required: true %>
+    <%= f.password_field :password, class: "form-control", placeholder: "Password (min 6 characters)", required: true, autocomplete: "new-password" %>
   </div>
-
   <div class="mb-3">
-    <%= f.password_field :password, class: "form-control", placeholder: "Password", required: true %>
+    <%= f.password_field :password_confirmation, class: "form-control", placeholder: "Confirm Password", required: true, autocomplete: "new-password" %>
   </div>
-
-  <div class="mb-3">
-    <%= f.password_field :password_confirmation, class: "form-control", placeholder: "Confirm Password", required: true %>
-  </div>
-
-  <%= f.submit "Register", class: "btn btn-register w-100" %>
+  
+  <%= f.submit "Sign Up", class: "btn btn-success w-100" %>
 <% end %>

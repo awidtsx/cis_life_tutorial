@@ -101,3 +101,16 @@
 .module-description {
   color: #031249;
 }
+
+
+.card h3 {
+  font-weight: 700;
+}
+
+.list-group-item {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}

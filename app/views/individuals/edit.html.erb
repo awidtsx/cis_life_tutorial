@@ -1,10 +1,77 @@
-<h1>Editing individual</h1>
+<div class="container mt-4">
+  <div class="mb-3">
+    <%= link_to "← Back to individuals", individuals_path, class: "text-decoration-none" %>
+  </div>
 
-<%= render "form", individual: @individual %>
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Edit Individual</h2>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @individual, local: true) do |f| %>
+        <% if @individual.errors.any? %>
+          <div class="alert alert-danger" role="alert">
+            <h4><%= pluralize(@individual.errors.count, "error") %> prohibited this individual from being saved:</h4>
+            <ul class="mb-0">
+              <% @individual.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-<br>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <%= f.label :last_name, class: "form-label fw-bold" %>
+              <%= f.text_field :last_name, autofocus: true, class: "form-control", required: true, placeholder: "Enter last name" %>
+              <small class="form-text text-muted">Individual's family name</small>
+            </div>
 
-<div>
-  <%= link_to "Show this individual", @individual %> |
-  <%= link_to "Back to individuals", individuals_path %>
+            <div class="mb-3">
+              <%= f.label :first_name, class: "form-label fw-bold" %>
+              <%= f.text_field :first_name, class: "form-control", required: true, placeholder: "Enter first name" %>
+              <small class="form-text text-muted">Individual's given name</small>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :mi, "Middle Initial", class: "form-label fw-bold" %>
+              <%= f.text_field :mi, class: "form-control", maxlength: 3, placeholder: "Enter middle initial" %>
+              <small class="form-text text-muted">Optional middle initial</small>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mb-3">
+              <%= f.label :birth_date, class: "form-label fw-bold" %>
+              <%= f.date_field :birth_date, class: "form-control", required: true %>
+              <small class="form-text text-muted">Date of birth</small>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :gender, class: "form-label fw-bold" %>
+              <%= f.select :gender,
+                    options_for_select([
+                      ["Male", "Male"],
+                      ["Female", "Female"],
+                      ["Other", "Other"]
+                    ], @individual.gender),
+                    { prompt: "Select gender" },
+                    { class: "form-select", required: true } %>
+              <small class="form-text text-muted">Select the individual's gender</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <%= f.submit "Update Individual", class: "btn btn-primary" %>
+          <%= link_to "Cancel", individuals_path, class: "btn btn-tertiary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <%= link_to "View details", @individual, class: "text-decoration-none" %>
+  </div>
 </div>

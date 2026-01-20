@@ -1,0 +1,35 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 280px;
+  height: 100vh;
+
+  background-color: #F9CB25;
+  color: #031249;
+
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.sidebar .app-title {
+  color: #002C88;
+  font-weight: 700;
+}
+
+.sidebar .nav-category {
+  font-weight: 700;
+  color: #031249;
+}
+
+.sidebar .nav-link {
+  color: #031249;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #CCCCCC;
+  color: #031249;
+}

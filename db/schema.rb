@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_16_051440) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_20_061650) do
   create_table "add_barangays", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.bigint "add_municipal_id", null: false
@@ -43,10 +43,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_16_051440) do
 
   create_table "agreement_contracts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "insurance_product_id", null: false
-    t.bigint "cooperative_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["cooperative_id"], name: "index_agreement_contracts_on_cooperative_id"
+    t.string "contractable_type"
+    t.bigint "contractable_id"
+    t.index ["contractable_type", "contractable_id"], name: "idx_on_contractable_type_contractable_id_5b54a6533b"
+    t.index ["contractable_type", "contractable_id"], name: "index_agreement_contracts_on_contractable"
     t.index ["insurance_product_id"], name: "index_agreement_contracts_on_insurance_product_id"
   end
 
@@ -97,7 +99,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_16_051440) do
   end
 
   create_table "insurance_contracts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "rate_id", null: false
     t.string "insured_type", null: false
     t.bigint "insured_id", null: false
     t.integer "age"
@@ -107,10 +108,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_16_051440) do
     t.date "expiry"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "contract_id"
-    t.index ["contract_id"], name: "index_insurance_contracts_on_contract_id"
+    t.string "agreement_type"
+    t.bigint "agreement_id"
+    t.index ["agreement_type", "agreement_id"], name: "index_insurance_contracts_on_agreement"
+    t.index ["agreement_type", "agreement_id"], name: "index_insurance_contracts_on_agreement_type_and_agreement_id"
     t.index ["insured_type", "insured_id"], name: "index_insurance_contracts_on_insured"
-    t.index ["rate_id"], name: "index_insurance_contracts_on_rate_id"
   end
 
   create_table "insurance_groups", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -147,7 +149,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_16_051440) do
   add_foreign_key "add_barangays", "add_municipals"
   add_foreign_key "add_municipals", "add_provinces"
   add_foreign_key "add_provinces", "add_regions"
-  add_foreign_key "agreement_contracts", "cooperatives"
   add_foreign_key "agreement_contracts", "insurance_products"
   add_foreign_key "agreement_rates", "agreement_contracts", column: "contract_id"
   add_foreign_key "coop_memberships", "cooperatives"
@@ -156,8 +157,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_16_051440) do
   add_foreign_key "cooperatives", "add_municipals"
   add_foreign_key "cooperatives", "add_provinces"
   add_foreign_key "cooperatives", "add_regions"
-  add_foreign_key "insurance_contracts", "agreement_contracts", column: "contract_id"
-  add_foreign_key "insurance_contracts", "agreement_rates", column: "rate_id"
   add_foreign_key "insurance_groups", "agreement_contracts", column: "contract_id"
   add_foreign_key "insurance_groups", "cooperatives"
   add_foreign_key "insurance_groups", "insurance_contracts"

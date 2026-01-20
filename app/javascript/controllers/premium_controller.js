@@ -9,12 +9,15 @@ export default class extends Controller {
     "premiumPreview",
     "premiumInput"
   ]
+  
   connect() {
     console.log("Premium controller connected!")
   }
+  
   recalculate() {
-    // guard clause
     console.log("recalculate called")
+    
+    // Guard clause
     if (!this.effectivityTarget.value || !this.expiryTarget.value) {
       this.premiumPreviewTarget.textContent = "-"
       this.premiumInputTarget.value = ""
@@ -24,7 +27,7 @@ export default class extends Controller {
     const start = new Date(this.effectivityTarget.value)
     const end   = new Date(this.expiryTarget.value)
 
-    // calculate term (months)
+    // Calculate term (months)
     const term =
       (end.getFullYear() * 12 + end.getMonth()) -
       (start.getFullYear() * 12 + start.getMonth())
@@ -36,14 +39,26 @@ export default class extends Controller {
     }
 
     const amount = parseFloat(this.amountTarget.value || 0)
-    const rate   = parseFloat(
-      this.rateTarget.selectedOptions[0]?.text || 0
-    )
+    
+    // Get rate value - could be from select or custom input
+    let rate = 0
+    
+    // Check if custom rate input exists (for individual contracts)
+    const customRateInput = document.getElementById('custom_rate_input')
+    if (customRateInput && customRateInput.value) {
+      rate = parseFloat(customRateInput.value || 0)
+    } else if (this.hasRateTarget) {
+      // Try to get from select dropdown
+      const selectedOption = this.rateTarget.selectedOptions[0]
+      if (selectedOption) {
+        rate = parseFloat(selectedOption.text || 0)
+      }
+    }
 
     const premium = (amount / 1000) * rate * term
 
     this.premiumPreviewTarget.textContent =
-      premium.toLocaleString(undefined, { minimumFractionDigits: 2 })
+      premium.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
     this.premiumInputTarget.value = premium.toFixed(2)
   }

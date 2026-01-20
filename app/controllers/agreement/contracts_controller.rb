@@ -66,23 +66,12 @@ class Agreement::ContractsController < ApplicationController
     end
 
     def load_contract
-      @cooperatives = Cooperative.all
-      @products  = InsuranceProduct.all
+      @cooperatives = Cooperative.order(:name)
+      @individuals = Individual.order(:last_name, :first_name)
+      @products = InsuranceProduct.order(:name)
     end
 
-    def get_cooperative
-    @cooperatives = Cooperative.where(cooperative_id: params[:cooperative_id])
-    respond_to do |format|
-      format.json { render json: @cooperatives }
-      end
-    end
 
-    def get_product
-    @products = InsuranceProduct.where(insurance_product_id: params[:insurance_product_id])
-    respond_to do |format|
-      format.json { render json: @products }
-      end
-    end
     # Only allow a list of trusted parameters through.
     def agreement_contract_params
       params.require(:agreement_contract).permit(:insurance_product_id, :cooperative_id)

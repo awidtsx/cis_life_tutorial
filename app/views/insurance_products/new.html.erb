@@ -1,30 +1,84 @@
-<h1>New insurance product</h1>
-
-<%= form_with(model: @insurance_product, local: true) do |f| %>
-
+<div class="container mt-4">
   <div class="mb-3">
-    <%= f.label :name, class: "form-label" %>
-    <%= f.text_field :name, autofocus: true, class: "form-control", required: true %>
+    <%= link_to "← Back to insurance products", insurance_products_path, class: "text-decoration-none" %>
   </div>
-  <div class="mb-3">
-    <%= f.label :description, class: "form-label" %>
-    <%= f.text_field :description, autofocus: true, class: "form-control", required: true %>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">New Insurance Product</h2>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @insurance_product, local: true) do |f| %>
+        <% if @insurance_product.errors.any? %>
+          <div class="alert alert-danger" role="alert">
+            <h4><%= pluralize(@insurance_product.errors.count, "error") %> prohibited this insurance product from being saved:</h4>
+            <ul class="mb-0">
+              <% @insurance_product.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="mb-3">
+          <%= f.label :name, class: "form-label fw-bold" %>
+          <%= f.text_field :name, autofocus: true, class: "form-control", required: true, placeholder: "Enter product name" %>
+          <small class="form-text text-muted">Provide a clear and descriptive name for the insurance product</small>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :description, class: "form-label fw-bold" %>
+          <%= f.text_area :description, class: "form-control", required: true, rows: 4, placeholder: "Enter product description" %>
+          <small class="form-text text-muted">Describe the features and benefits of this insurance product</small>
+        </div>
+
+        <div class="field mb-3">
+          <%= f.label :product_type, "Product Type", class: "form-label fw-bold" %>
+          <%= f.select :product_type,
+                InsuranceProduct.product_types.values,
+                { prompt: "Select product type" },
+                class: "tom-select" %>
+          <small class="form-text text-muted">Choose whether this is an individual or group insurance product</small>
+        </div>
+
+        <div class="alert alert-info mt-3">
+          <strong>Note:</strong> All fields are required. Make sure to fill out the complete information before submitting.
+        </div>
+
+        <div class="mt-4">
+          <%= f.submit "Create Insurance Product", class: "btn btn-primary" %>
+          <%= link_to "Cancel", insurance_products_path, class: "btn btn-tertiary" %>
+        </div>
+      <% end %>
+    </div>
   </div>
-  <div class="field">
-  <%= f.label :product_type, "Product Type" %>
-  <%= f.select :product_type,
-        InsuranceProduct.product_types.values,
-        { prompt: "Select product type" },
-        class: "tom-select" %>
+
+  <!-- Optional: Quick Reference Section -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-primary">
+            <i class="bi bi-info-circle"></i> About Insurance Products
+          </h5>
+          <p class="card-text text-muted">
+            Insurance products are the offerings available to cooperatives and individuals. Each product can have different types and coverage options.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-primary">
+            <i class="bi bi-question-circle"></i> Product Types
+          </h5>
+          <p class="card-text text-muted">
+            <strong>Individual:</strong> Products designed for individual policyholders.<br>
+            <strong>Group:</strong> Products designed for group policies through cooperatives.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-  <%= f.submit class: "btn btn-primary" %>
-
-
-
-<% end %>
-
-<br>
-
-<div>
-  <%= link_to "Back to insurance products", insurance_products_path %>
 </div>

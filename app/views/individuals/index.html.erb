@@ -1,14 +1,57 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Individuals</h1>
-
-<div id="individuals">
-  <% @individuals.each do |individual| %>
-    <%= render individual %>
-    <p>
-      <%= link_to "Show this individual", individual %>
-    </p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
-</div>
 
-<%= link_to "New individual", new_individual_path %>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-primary fw-bold">Individuals</h1>
+    <%= link_to "New Individual", new_individual_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @individuals.empty? %>
+        <div class="text-center py-5">
+          <p class="text-muted mb-3">No individuals found</p>
+          <%= link_to "Create your first individual", new_individual_path, class: "btn btn-primary" %>
+        </div>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-primary">
+              <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Birth Date</th>
+                <th>Gender</th>
+                <th>Created At</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @individuals.each do |individual| %>
+                <tr>
+                  <td><%= individual.id %></td>
+                  <td><strong><%= individual.full_name %></strong></td>
+                  <td><%= individual.birth_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+                  <td><%= individual.gender %></td>
+                  <td><%= individual.created_at.strftime("%B %d, %Y") %></td>
+                  <td class="text-end">
+                    <%= link_to "View", individual, class: "btn btn-sm btn-outline-primary" %>
+                    <%= link_to "Edit", edit_individual_path(individual), class: "btn btn-sm btn-outline-secondary" %>
+                    <%= button_to "Delete", individual, method: :delete, 
+                        data: { confirm: "Are you sure you want to delete this individual?" }, 
+                        class: "btn btn-sm btn-outline-danger" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

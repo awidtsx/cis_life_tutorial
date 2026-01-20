@@ -1,15 +1,105 @@
-<p style="color: green"><%= notice %></p>
-
-<div id="agreement_contracts">
-  <% @agreement_contracts.each do |agreement_contract| %>
-    <strong>Cooperative:</strong> <%= agreement_contract.cooperative&.name %><br>
-    <strong>Insurance Product:</strong> <%= agreement_contract.insurance_product&.name %><br>
-
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
 
-<div>
-  <%= link_to "Edit this contract", edit_agreement_contract_path(@agreement_contract) %> |
-  <%= link_to "Back to contracts", agreement_contracts_path %>
+  <div class="mb-3">
+    <%= link_to "← Back to contracts", agreement_contracts_path, class: "text-decoration-none" %>
+  </div>
 
-  <%= button_to "Destroy this contract", @agreement_contract, method: :delete %>
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Contract Details</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-primary mb-3">
+                <%= @agreement_contract.contractable_type %> Information
+                <span class="badge <%= @agreement_contract.contractable_type == 'Cooperative' ? 'bg-primary' : 'bg-secondary' %> ms-2">
+                  <%= @agreement_contract.contractable_type %>
+                </span>
+              </h5>
+              <p class="mb-2">
+                <strong>Name:</strong><br>
+                <span class="fs-5"><%= @agreement_contract.contractable_name %></span>
+              </p>
+              <% if @agreement_contract.contractable_type == 'Cooperative' && @agreement_contract.contractable %>
+                <p class="mb-1 text-muted">
+                  <small>
+                    <strong>Region:</strong> <%= @agreement_contract.contractable.region&.name || 'N/A' %><br>
+                    <strong>Province:</strong> <%= @agreement_contract.contractable.province&.name || 'N/A' %><br>
+                    <strong>Municipal:</strong> <%= @agreement_contract.contractable.municipal&.name || 'N/A' %><br>
+                    <strong>Barangay:</strong> <%= @agreement_contract.contractable.barangay&.name || 'N/A' %>
+                  </small>
+                </p>
+              <% elsif @agreement_contract.contractable_type == 'Individual' && @agreement_contract.contractable %>
+                <p class="mb-1 text-muted">
+                  <small>
+                    <strong>Birth Date:</strong> <%= @agreement_contract.contractable.birth_date&.strftime("%B %d, %Y") || 'N/A' %><br>
+                    <strong>Gender:</strong> <%= @agreement_contract.contractable.gender || 'N/A' %>
+                  </small>
+                </p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-primary mb-3">Insurance Product</h5>
+              <p class="mb-2">
+                <strong>Product Name:</strong><br>
+                <span class="fs-5"><%= @agreement_contract.insurance_product&.name || 'N/A' %></span>
+              </p>
+              <% if @agreement_contract.insurance_product %>
+                <p class="mb-1">
+                  <strong>Description:</strong><br>
+                  <%= @agreement_contract.insurance_product.description %>
+                </p>
+                <p class="mb-0">
+                  <strong>Product Type:</strong><br>
+                  <span class="badge bg-secondary"><%= @agreement_contract.insurance_product.product_type %></span>
+                </p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-primary mb-3">Contract Information</h5>
+          <div class="row">
+            <div class="col-md-4 mb-2">
+              <strong>Contract ID:</strong><br>
+              <span class="text-muted">#<%= @agreement_contract.id %></span>
+            </div>
+            <div class="col-md-4 mb-2">
+              <strong>Created At:</strong><br>
+              <span class="text-muted"><%= @agreement_contract.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+            </div>
+            <div class="col-md-4 mb-2">
+              <strong>Last Updated:</strong><br>
+              <span class="text-muted"><%= @agreement_contract.updated_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <%= link_to "Edit this contract", edit_agreement_contract_path(@agreement_contract), class: "btn btn-primary" %>
+        <%= link_to "Back to contracts", agreement_contracts_path, class: "btn btn-secondary" %>
+        <%= button_to "Delete this contract", @agreement_contract, method: :delete,
+            data: { confirm: "Are you sure you want to delete this contract?" },
+            class: "btn btn-tertiary" %>
+      </div>
+    </div>
+  </div>
 </div>
