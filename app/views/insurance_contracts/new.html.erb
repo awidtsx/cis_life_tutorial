@@ -1,10 +1,10 @@
 <div class="container mt-4">
   <div class="mb-3">
-    <%= link_to "← Back", @insured, class: "text-decoration-none" %>
+    <%= link_to "← Back", @insured, class: "text-decoration-none", style: "color: #CCCCCC;" %>
   </div>
 
   <div class="card">
-    <div class="card-header bg-primary text-white">
+    <div class="card-header text-white" style="background-color: #002C88;">
       <h2 class="mb-0">New Insurance Contract</h2>
       <% if @insured.is_a?(Individual) %>
         <small class="text-white-50">For: <%= @insured.full_name %></small>
@@ -51,8 +51,13 @@
 
                 <div class="field mb-3">
                   <%= f.label :custom_rate, "Rate (Manual Entry)", class: "form-label fw-bold" %>
-                  <%= f.number_field :custom_rate, id: "custom_rate_input", class: "form-control", step: 0.01, min: 0, 
+                  <%= number_field_tag 'insurance_contract[custom_rate]', nil, 
+                      id: "custom_rate_input", 
+                      class: "form-control", 
+                      step: 0.01, 
+                      min: 0, 
                       placeholder: "Enter rate manually",
+                      required: true,
                       data: { premium_target: "rate", action: "input->premium#recalculate" } %>
                   <small class="form-text text-muted">Enter the rate manually for premium calculation</small>
                 </div>
@@ -121,16 +126,18 @@
 
               <div class="mb-3">
                 <%= f.label :premium, "Premium (Calculated)", class: "form-label fw-bold" %>
-                <p class="fs-5 text-primary" data-premium-target="premiumPreview">
-                  <%= number_to_currency(@insurance_contract.premium || 0) %>
-                </p>
-                <%= f.hidden_field :premium, data: { premium_target: "premiumInput" } %>
-                <small class="form-text text-muted">Premium is calculated automatically</small>
+                <div class="p-3 rounded" style="background-color: #F9CB25;">
+                  <p class="fs-5 fw-bold mb-0" style="color: #031249;" data-premium-target="premiumPreview">
+                    ₱0.00
+                  </p>
+                </div>
+                <%= f.hidden_field :premium, value: 0, data: { premium_target: "premiumInput" } %>
+                <small class="form-text text-muted">Premium is calculated automatically based on inputs above</small>
               </div>
             </div>
           </div>
 
-          <div class="alert alert-info mt-3">
+          <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
             <% if @insured.is_a?(Individual) %>
               <strong>Note:</strong> For individual contracts, select an agreement contract and manually enter the rate for premium calculation.
             <% else %>
@@ -139,8 +146,8 @@
           </div>
 
           <div class="mt-4">
-            <%= f.submit "Create Insurance Contract", class: "btn btn-primary" %>
-            <%= link_to "Cancel", @insured, class: "btn btn-tertiary" %>
+            <%= f.submit "Create Insurance Contract", class: "btn text-white", style: "background-color: #002C88;" %>
+            <%= link_to "Cancel", @insured, class: "btn text-white", style: "background-color: #A80F21;" %>
           </div>
         <% end %>
       </div>

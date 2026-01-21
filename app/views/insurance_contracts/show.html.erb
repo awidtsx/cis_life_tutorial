@@ -1,10 +1,141 @@
-<p style="color: green"><%= notice %></p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% end %>
 
-<%= render @insurance_contract %>
+  <div class="mb-3">
+    <%= link_to "← Back", @insured, class: "text-decoration-none", style: "color: #CCCCCC;" %>
+  </div>
 
-<div>
-  <%= link_to "Edit this insurance contract", edit_insurance_contract_path(@insurance_contract) %> |
-  <%= link_to "Back to insurance contracts", insurance_contracts_path %>
+  <div class="card">
+    <div class="card-header text-white" style="background-color: #002C88;">
+      <h2 class="mb-0">Insurance Contract Details</h2>
+      <% if @insurance_contract.insured.is_a?(Individual) %>
+        <small class="text-white-50">Insured: <%= @insurance_contract.insured.full_name %></small>
+      <% elsif @insurance_contract.insured.is_a?(CoopMembership) %>
+        <small class="text-white-50">Insured: <%= @insurance_contract.insured.cooperative&.name %> - <%= @insurance_contract.insured.individual&.full_name %></small>
+      <% end %>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <!-- Agreement Information -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title" style="color: #002C88;">Agreement Information</h5>
+              <div class="mb-3">
+                <strong>Agreement Type:</strong><br>
+                <% 
+                  is_rate_type = @insurance_contract.agreement_type == 'Agreement::Rate'
+                  badge_bg = is_rate_type ? '#002C88' : '#F9CB25'
+                  badge_color = is_rate_type ? '#FDFDFD' : '#031249'
+                %>
+                <span class="badge" style="background-color: <%= badge_bg %>; color: <%= badge_color %>;">
+                  <%= @insurance_contract.agreement_type&.split('::')&.last || 'N/A' %>
+                </span>
+              </div>
+              <div class="mb-3">
+                <strong>Agreement ID:</strong><br>
+                <span class="text-muted">#<%= @insurance_contract.agreement_id %></span>
+              </div>
+              <% if @insurance_contract.agreement_type == 'Agreement::Contract' && @insurance_contract.agreement %>
+                <div class="mb-3">
+                  <strong>Product:</strong><br>
+                  <%= @insurance_contract.agreement.insurance_product&.name || 'N/A' %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
 
-  <%= button_to "Destroy this insurance contract", @insurance_contract, method: :delete %>
+        <!-- Contract Details -->
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title" style="color: #002C88;">Contract Details</h5>
+              <div class="mb-3">
+                <strong>Age:</strong><br>
+                <%= @insurance_contract.age %> years
+              </div>
+              <div class="mb-3">
+                <strong>Contract Period:</strong><br>
+                <%= @insurance_contract.effectivity&.strftime("%B %d, %Y") %> to <%= @insurance_contract.expiry&.strftime("%B %d, %Y") %>
+                <br>
+                <small class="text-muted">(<%= @insurance_contract.term %> months)</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Information -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title" style="color: #002C88;">Financial Information</h5>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="p-3 rounded text-center" style="background-color: #F9CB25;">
+                <small style="color: #031249;">Rate</small>
+                <h3 class="mb-0 fw-bold" style="color: #031249;">
+                  <%= number_with_precision(@insurance_contract.rate, precision: 2) %>%
+                </h3>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="p-3 rounded text-center" style="background-color: #002C88;">
+                <small style="color: #FDFDFD;">Amount Covered</small>
+                <h3 class="mb-0 fw-bold" style="color: #FDFDFD;">
+                  <%= number_to_currency(@insurance_contract.amount_covered, precision: 2) %>
+                </h3>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="p-3 rounded text-center" style="background-color: #031249;">
+                <small style="color: #FDFDFD;">Premium</small>
+                <h3 class="mb-0 fw-bold" style="color: #FDFDFD;">
+                  <%= number_to_currency(@insurance_contract.premium, precision: 2) %>
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div class="alert mt-3" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;">
+            <strong>Calculation:</strong> Premium = (Amount Covered ÷ 1,000) × Rate × Term<br>
+            <small>(<%= number_to_currency(@insurance_contract.amount_covered) %> ÷ 1,000) × <%= @insurance_contract.rate %>% × <%= @insurance_contract.term %> months = <%= number_to_currency(@insurance_contract.premium) %></small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metadata -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title" style="color: #002C88;">Record Information</h5>
+          <div class="row">
+            <div class="col-md-4">
+              <strong>Contract ID:</strong><br>
+              <span class="text-muted">#<%= @insurance_contract.id %></span>
+            </div>
+            <div class="col-md-4">
+              <strong>Created At:</strong><br>
+              <span class="text-muted"><%= @insurance_contract.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+            </div>
+            <div class="col-md-4">
+              <strong>Last Updated:</strong><br>
+              <span class="text-muted"><%= @insurance_contract.updated_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <%= link_to "Edit this contract", edit_individual_insurance_contract_path(@insured, @insurance_contract), class: "btn text-white", style: "background-color: #002C88;" %>
+        <%= link_to "Back", @insured, class: "btn text-white", style: "background-color: #CCCCCC; color: #031249;" %>
+        <%= button_to "Delete this contract", [@insured, @insurance_contract], method: :delete,
+            data: { confirm: "Are you sure you want to delete this insurance contract?" },
+            class: "btn text-white", style: "background-color: #A80F21;" %>
+      </div>
+    </div>
+  </div>
 </div>

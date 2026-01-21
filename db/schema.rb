@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_20_061650) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_21_015603) do
   create_table "add_barangays", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.bigint "add_municipal_id", null: false
@@ -110,6 +110,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_20_061650) do
     t.datetime "updated_at", null: false
     t.string "agreement_type"
     t.bigint "agreement_id"
+    t.decimal "rate", precision: 10, scale: 2
     t.index ["agreement_type", "agreement_id"], name: "index_insurance_contracts_on_agreement"
     t.index ["agreement_type", "agreement_id"], name: "index_insurance_contracts_on_agreement_type_and_agreement_id"
     t.index ["insured_type", "insured_id"], name: "index_insurance_contracts_on_insured"

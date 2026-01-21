@@ -1,112 +1,93 @@
-class InsuranceContractsController < ApplicationController
-  before_action :set_insured
-  before_action :set_insurance_contract, only: %i[ show edit update destroy ]
-  before_action :load_contract, only: %i[ new create edit update ]
-  
-  # GET /insurance_contracts or /insurance_contracts.json
+class InsuranceGroupsController < ApplicationController
+  before_action :set_insurance_group, only: %i[ show edit update destroy ]
+  before_action :load_options, only: %i[ new create edit update ]
+
+  # GET /insurance_groups or /insurance_groups.json
   def index
-    @insurance_contracts = InsuranceContract.all
+    @insurance_groups = InsuranceGroup.includes(:cooperative, :contract).all
   end
 
-  # GET /insurance_contracts/1 or /insurance_contracts/1.json
+  # GET /insurance_groups/1 or /insurance_groups/1.json
   def show
+    @insurance_group = InsuranceGroup.includes(
+      cooperative: { coop_memberships: :individual },
+      contract: :insurance_product
+    ).find(params[:id])
+    
+    # Get all insurance contracts created through this group
+    @group_insurance_contracts = InsuranceContract.where(insurance_group_id: @insurance_group.id)
   end
 
-  # GET /insurance_contracts/new
+  # GET /insurance_groups/new
   def new
-    @insurance_contract = @insured.insurance_contracts.build
+    @insurance_group = InsuranceGroup.new
   end
 
-  # GET /insurance_contracts/1/edit
+  # GET /insurance_groups/1/edit
   def edit
   end
 
-  # POST /insurance_contracts or /insurance_contracts.json
+  # POST /insurance_groups or /insurance_groups.json
   def create
-    @insurance_contract = @insured.insurance_contracts.build(insurance_contract_params)
-    
-    # Handle custom rate for individual contracts
-    if @insured.is_a?(Individual) && params[:insurance_contract][:custom_rate].present?
-      custom_rate = params[:insurance_contract][:custom_rate].to_f
-      # Calculate premium with custom rate
-      if @insurance_contract.amount_covered.present? && 
-         @insurance_contract.effectivity.present? && 
-         @insurance_contract.expiry.present?
-        term = calculate_term(@insurance_contract.effectivity, @insurance_contract.expiry)
-        @insurance_contract.premium = (@insurance_contract.amount_covered.to_f / 1000) * custom_rate * term
-      end
-    end
+    @insurance_group = InsuranceGroup.new(insurance_group_params)
 
     respond_to do |format|
-      if @insurance_contract.save
-        format.html { redirect_to [@insured, @insurance_contract], notice: "Insurance contract was successfully created." }
-        format.json { render :show, status: :created }
+      if @insurance_group.save
+        format.html { redirect_to @insurance_group, notice: "Insurance group was successfully created." }
+        format.json { render :show, status: :created, location: @insurance_group }
       else
+        load_options
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @insurance_contract.errors, status: :unprocessable_entity }
+        format.json { render json: @insurance_group.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PATCH/PUT /insurance_contracts/1 or /insurance_contracts/1.json
+  # PATCH/PUT /insurance_groups/1 or /insurance_groups/1.json
   def update
     respond_to do |format|
-      if @insurance_contract.update(insurance_contract_params)
-        format.html { redirect_to [@insured, @insurance_contract], notice: "Insurance contract was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @insurance_contract }
+      if @insurance_group.update(insurance_group_params)
+        format.html { redirect_to @insurance_group, notice: "Insurance group was successfully updated.", status: :see_other }
+        format.json { render :show, status: :ok, location: @insurance_group }
       else
+        load_options
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @insurance_contract.errors, status: :unprocessable_entity }
+        format.json { render json: @insurance_group.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /insurance_contracts/1 or /insurance_contracts/1.json
+  # DELETE /insurance_groups/1 or /insurance_groups/1.json
   def destroy
-    @insurance_contract.destroy!
+    @insurance_group.destroy!
 
     respond_to do |format|
-      format.html { redirect_to @insured, notice: "Insurance contract was successfully destroyed.", status: :see_other }
+      format.html { redirect_to insurance_groups_path, notice: "Insurance group was successfully destroyed.", status: :see_other }
       format.json { head :no_content }
     end
   end
-
-  def load_contract
-    @agreement_rates = Agreement::Rate.order(:age_from)
-    @agreement_contracts = Agreement::Contract.includes(:contractable, :insurance_product).order(:id)
+  
+  # GET /insurance_groups/:id/rates - AJAX endpoint to get filtered rates
+  def rates_for_contract
+    contract = Agreement::Contract.find(params[:contract_id])
+    @rates = contract.agreement_rates.order(:age_from)
     
-    # If insured is an Individual, load only contracts that match the individual
-    if @insured.is_a?(Individual)
-      @individual_contracts = Agreement::Contract
-        .where(contractable_type: 'Individual', contractable_id: @insured.id)
-        .includes(:insurance_product)
-        .order(:id)
+    respond_to do |format|
+      format.json { render json: @rates.map { |r| { id: r.id, rate: r.rate, age_from: r.age_from, age_to: r.age_to, min_amount: r.min_amount, max_amount: r.max_amount } } }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_insurance_contract
-      @insurance_contract = InsuranceContract.find(params[:id])
-    end
-
-    def set_insured
-      if params[:individual_id]
-        @insured = Individual.find(params[:individual_id])
-      elsif params[:coop_membership_id]
-        @insured = CoopMembership.find(params[:coop_membership_id])
-      else
-        raise ActiveRecord::RecordNotFound, "Insured not found"
-      end
+    def set_insurance_group
+      @insurance_group = InsuranceGroup.find(params[:id])
     end
     
-    def calculate_term(start_date, end_date)
-      return 0 if start_date.blank? || end_date.blank?
-      (end_date.year * 12 + end_date.month) - (start_date.year * 12 + start_date.month)
+    def load_options
+      @cooperatives = Cooperative.order(:name)
+      @contracts = Agreement::Contract.includes(:insurance_product).order(:id)
     end
 
-    # Only allow a list of trusted parameters through.
-    def insurance_contract_params
-      params.require(:insurance_contract).permit(:agreement_id, :agreement_type, :age, :amount_covered, :premium, :effectivity, :expiry)
+    def insurance_group_params
+      params.require(:insurance_group).permit(:cooperative_id, :contract_id)
     end
 end
