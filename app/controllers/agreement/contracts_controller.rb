@@ -1,9 +1,10 @@
 class Agreement::ContractsController < ApplicationController
   before_action :set_agreement_contract, only: %i[ show edit update destroy ]
   before_action :load_contract, only: %i[ new create edit update ]
+  
   # GET /agreement/contracts or /agreement/contracts.json
   def index
-    @agreement_contracts = Agreement::Contract.all
+    @agreement_contracts = Agreement::Contract.includes(:contractable, :insurance_product).all
   end
 
   # GET /agreement/contracts/1 or /agreement/contracts/1.json
@@ -14,7 +15,6 @@ class Agreement::ContractsController < ApplicationController
   # GET /agreement/contracts/new
   def new
     @agreement_contract = Agreement::Contract.new
-
   end
 
   # GET /agreement/contracts/1/edit
@@ -71,9 +71,8 @@ class Agreement::ContractsController < ApplicationController
       @products = InsuranceProduct.order(:name)
     end
 
-
     # Only allow a list of trusted parameters through.
     def agreement_contract_params
-      params.require(:agreement_contract).permit(:insurance_product_id, :cooperative_id)
+      params.require(:agreement_contract).permit(:insurance_product_id, :contractable_id, :contractable_type)
     end
 end

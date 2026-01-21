@@ -5,7 +5,15 @@ class Agreement::Contract < ApplicationRecord
   belongs_to :contractable, polymorphic: true
 
   def contractable_name
-    contractable&.name || contractable&.full_name || 'N/A'
+    case contractable
+      when Cooperative
+        contractable.name
+      when Individual
+        contractable.full_name
+      else
+      'N/A'
+    end
   end
+
 
 end

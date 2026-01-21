@@ -36,4 +36,9 @@ class InsuranceContract < ApplicationRecord
       0
     end
   end
+
+  def display_rate
+    return 'N/A' if rate_value.blank?
+    "#{rate_value}%"
+  end
 end
