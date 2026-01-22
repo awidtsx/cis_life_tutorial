@@ -3,20 +3,29 @@ class InsuranceGroupsController < ApplicationController
 
   # GET /insurance_groups or /insurance_groups.json
   def index
-    @insurance_groups = InsuranceGroup.all
+    @insurance_groups = InsuranceGroup.includes(:cooperative, :contract).all
   end
 
   # GET /insurance_groups/1 or /insurance_groups/1.json
   def show
+    @insurance_group = InsuranceGroup.includes(
+      cooperative: { coop_memberships: :individual },
+      contract: :insurance_product
+    ).find(params[:id])
+    @members = @insurance_group.cooperative.coop_memberships.includes(:individual)
+    # Get all insurance contracts where insured is InsuranceGroup with this ID
+    @group_contracts = InsuranceContract.where(insured: @insurance_group)
   end
 
   # GET /insurance_groups/new
   def new
     @insurance_group = InsuranceGroup.new
+    load_data
   end
 
   # GET /insurance_groups/1/edit
   def edit
+    load_data
   end
 
   # POST /insurance_groups or /insurance_groups.json
@@ -28,6 +37,7 @@ class InsuranceGroupsController < ApplicationController
         format.html { redirect_to @insurance_group, notice: "Insurance group was successfully created." }
         format.json { render :show, status: :created, location: @insurance_group }
       else
+        load_data
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @insurance_group.errors, status: :unprocessable_entity }
       end
@@ -41,6 +51,7 @@ class InsuranceGroupsController < ApplicationController
         format.html { redirect_to @insurance_group, notice: "Insurance group was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @insurance_group }
       else
+        load_data
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @insurance_group.errors, status: :unprocessable_entity }
       end
@@ -58,13 +69,19 @@ class InsuranceGroupsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_insurance_group
       @insurance_group = InsuranceGroup.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
+    def load_data
+      @cooperatives = Cooperative.order(:name)
+      @agreement_contracts = Agreement::Contract
+        .where(contractable_type: 'Cooperative')
+        .includes(:insurance_product, :contractable)
+        .order(:id)
+    end
+
     def insurance_group_params
-      params.require(:insurance_group).permit(:insurance_contract_id, :cooperative_id, :contract_id)
+      params.require(:insurance_group).permit(:cooperative_id, :contract_id)
     end
 end

@@ -5,4 +5,5 @@ class Cooperative < ApplicationRecord
   belongs_to :barangay, class_name: "AddBarangay", foreign_key: "add_barangay_id", optional: true
 
   has_many :contracts, as: :contractable, class_name: "Agreement::Contract"
+  has_many :coop_memberships
 end

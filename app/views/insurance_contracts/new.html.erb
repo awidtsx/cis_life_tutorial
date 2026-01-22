@@ -10,6 +10,8 @@
         <small class="text-white-50">For: <%= @insured.full_name %></small>
       <% elsif @insured.is_a?(CoopMembership) %>
         <small class="text-white-50">For: <%= @insured.cooperative&.name %> - <%= @insured.individual&.full_name %></small>
+      <% elsif @insured.is_a?(InsuranceGroup) %>
+        <small class="text-white-50">Group: <%= @insured.cooperative&.name %> (Contract #<%= @insured.contract&.id %>)</small>
       <% end %>
     </div>
     <div class="card-body">
@@ -26,11 +28,102 @@
             </div>
           <% end %>
 
-          <div class="row">
-            <div class="col-md-6">
-              <!-- Different flow based on insured type -->
-              <% if @insured.is_a?(Individual) %>
-                <!-- For Individual: Select Agreement Contract that matches individual -->
+          <% if @insured.is_a?(InsuranceGroup) %>
+            <!-- Insurance Group Flow -->
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <div class="card" style="border: 2px solid #F9CB25; background-color: #FDFDFD;">
+                  <div class="card-body">
+                    <h5 style="color: #031249;">Group Contract Information</h5>
+                    <p class="mb-2">
+                      <strong>Cooperative:</strong> <%= @insured.cooperative&.name %><br>
+                      <strong>Agreement Contract:</strong> #<%= @insured.contract&.id %><br>
+                      <strong>Insurance Product:</strong> <%= @insured.contract&.insurance_product&.name %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="field mb-3">
+                  <%= f.label :coop_membership_id, "Select Member", class: "form-label fw-bold" %>
+                  <%= f.select :coop_membership_id,
+                        options_from_collection_for_select(@members, :id, ->(m) { "#{m.individual.full_name} (Age: #{((Date.today - m.individual.birth_date) / 365).to_i})" }, @insurance_contract.insured_id),
+                        { prompt: "Select a member" },
+                        { id: "member_select", class: "form-select", required: true } %>
+                  <small class="form-text text-muted">Choose the cooperative member for this contract</small>
+                </div>
+
+                <div class="field mb-3">
+                  <%= f.label :agreement_id, "Rate", class: "form-label fw-bold" %>
+                  <%= f.select :agreement_id,
+                        grouped_options_for_select(
+                          @available_rates.group_by { |r| "Age #{r.age_from}-#{r.age_to}" }.map do |age_range, rates|
+                            [
+                              age_range,
+                              rates.map { |r| ["Rate: #{r.rate}% (Amount: #{number_to_currency(r.min_amount)} - #{number_to_currency(r.max_amount)})", r.id, { 'data-rate' => r.rate }] }
+                            ]
+                          end,
+                          @insurance_contract.agreement_id
+                        ),
+                        { prompt: "Select a rate" },
+                        { id: "rate_select", class: "form-select", required: true, data: { premium_target: "rate", action: "change->premium#recalculate" } } %>
+                  <%= f.hidden_field :agreement_type, value: "Agreement::Rate" %>
+                  <small class="form-text text-muted">Select the rate based on member's age</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :age, class: "form-label fw-bold" %>
+                  <%= f.number_field :age, class: "form-control", required: true, step: 1, min: 0 %>
+                  <small class="form-text text-muted">Enter the member's age</small>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <%= f.label :amount_covered, class: "form-label fw-bold" %>
+                  <%= f.number_field :amount_covered, class: "form-control", required: true, step: 0.01, min: 0, 
+                      data: { premium_target: "amount", action: "input->premium#recalculate" } %>
+                  <small class="form-text text-muted">Enter the coverage amount</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :effectivity, class: "form-label fw-bold" %>
+                  <%= f.date_field :effectivity, class: "form-control", required: true,
+                      data: { premium_target: "effectivity", action: "change->premium#recalculate" } %>
+                  <small class="form-text text-muted">Contract start date</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :expiry, class: "form-label fw-bold" %>
+                  <%= f.date_field :expiry, class: "form-control", required: true,
+                      data: { premium_target: "expiry", action: "change->premium#recalculate" } %>
+                  <small class="form-text text-muted">Contract end date</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :premium, "Premium (Calculated)", class: "form-label fw-bold" %>
+                  <div class="p-3 rounded" style="background-color: #F9CB25;">
+                    <p class="fs-5 fw-bold mb-0" style="color: #031249;" data-premium-target="premiumPreview">
+                      ₱0.00
+                    </p>
+                  </div>
+                  <%= f.hidden_field :premium, value: 0, data: { premium_target: "premiumInput" } %>
+                  <small class="form-text text-muted">Premium is calculated automatically</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
+              <strong>Note:</strong> Select a member from the cooperative and choose the appropriate rate based on their age. The premium will be calculated automatically.
+            </div>
+
+          <% elsif @insured.is_a?(Individual) %>
+            <!-- Individual Flow (existing code) -->
+            <div class="row">
+              <div class="col-md-6">
                 <div class="field mb-3">
                   <%= f.label :agreement_id, "Agreement Contract", class: "form-label fw-bold" %>
                   <%= f.select :agreement_id,
@@ -62,8 +155,56 @@
                   <small class="form-text text-muted">Enter the rate manually for premium calculation</small>
                 </div>
 
-              <% else %>
-                <!-- For CoopMembership: Choose Agreement Type (Rate or Contract) -->
+                <div class="mb-3">
+                  <%= f.label :age, class: "form-label fw-bold" %>
+                  <%= f.number_field :age, class: "form-control", required: true, step: 1, min: 0 %>
+                  <small class="form-text text-muted">Enter the insured's age</small>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <%= f.label :amount_covered, class: "form-label fw-bold" %>
+                  <%= f.number_field :amount_covered, class: "form-control", required: true, step: 0.01, min: 0, 
+                      data: { premium_target: "amount", action: "input->premium#recalculate" } %>
+                  <small class="form-text text-muted">Enter the coverage amount</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :effectivity, class: "form-label fw-bold" %>
+                  <%= f.date_field :effectivity, class: "form-control", required: true,
+                      data: { premium_target: "effectivity", action: "change->premium#recalculate" } %>
+                  <small class="form-text text-muted">Contract start date</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :expiry, class: "form-label fw-bold" %>
+                  <%= f.date_field :expiry, class: "form-control", required: true,
+                      data: { premium_target: "expiry", action: "change->premium#recalculate" } %>
+                  <small class="form-text text-muted">Contract end date</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :premium, "Premium (Calculated)", class: "form-label fw-bold" %>
+                  <div class="p-3 rounded" style="background-color: #F9CB25;">
+                    <p class="fs-5 fw-bold mb-0" style="color: #031249;" data-premium-target="premiumPreview">
+                      ₱0.00
+                    </p>
+                  </div>
+                  <%= f.hidden_field :premium, value: 0, data: { premium_target: "premiumInput" } %>
+                  <small class="form-text text-muted">Premium is calculated automatically based on inputs above</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
+              <strong>Note:</strong> For individual contracts, select an agreement contract and manually enter the rate for premium calculation.
+            </div>
+
+          <% else %>
+            <!-- CoopMembership Flow (existing code) -->
+            <div class="row">
+              <div class="col-md-6">
                 <div class="field mb-3">
                   <%= f.label :agreement_type, "Agreement Type", class: "form-label fw-bold" %>
                   <%= f.select :agreement_type,
@@ -93,57 +234,53 @@
                         { id: "contract_select", class: "tom-select" } %>
                   <small class="form-text text-muted">Choose the contract for this insurance</small>
                 </div>
-              <% end %>
 
-              <div class="mb-3">
-                <%= f.label :age, class: "form-label fw-bold" %>
-                <%= f.number_field :age, class: "form-control", required: true, step: 1, min: 0 %>
-                <small class="form-text text-muted">Enter the insured's age</small>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="mb-3">
-                <%= f.label :amount_covered, class: "form-label fw-bold" %>
-                <%= f.number_field :amount_covered, class: "form-control", required: true, step: 0.01, min: 0, 
-                    data: { premium_target: "amount", action: "input->premium#recalculate" } %>
-                <small class="form-text text-muted">Enter the coverage amount</small>
-              </div>
-
-              <div class="mb-3">
-                <%= f.label :effectivity, class: "form-label fw-bold" %>
-                <%= f.date_field :effectivity, class: "form-control", required: true,
-                    data: { premium_target: "effectivity", action: "change->premium#recalculate" } %>
-                <small class="form-text text-muted">Contract start date</small>
-              </div>
-
-              <div class="mb-3">
-                <%= f.label :expiry, class: "form-label fw-bold" %>
-                <%= f.date_field :expiry, class: "form-control", required: true,
-                    data: { premium_target: "expiry", action: "change->premium#recalculate" } %>
-                <small class="form-text text-muted">Contract end date</small>
-              </div>
-
-              <div class="mb-3">
-                <%= f.label :premium, "Premium (Calculated)", class: "form-label fw-bold" %>
-                <div class="p-3 rounded" style="background-color: #F9CB25;">
-                  <p class="fs-5 fw-bold mb-0" style="color: #031249;" data-premium-target="premiumPreview">
-                    ₱0.00
-                  </p>
+                <div class="mb-3">
+                  <%= f.label :age, class: "form-label fw-bold" %>
+                  <%= f.number_field :age, class: "form-control", required: true, step: 1, min: 0 %>
+                  <small class="form-text text-muted">Enter the insured's age</small>
                 </div>
-                <%= f.hidden_field :premium, value: 0, data: { premium_target: "premiumInput" } %>
-                <small class="form-text text-muted">Premium is calculated automatically based on inputs above</small>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <%= f.label :amount_covered, class: "form-label fw-bold" %>
+                  <%= f.number_field :amount_covered, class: "form-control", required: true, step: 0.01, min: 0, 
+                      data: { premium_target: "amount", action: "input->premium#recalculate" } %>
+                  <small class="form-text text-muted">Enter the coverage amount</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :effectivity, class: "form-label fw-bold" %>
+                  <%= f.date_field :effectivity, class: "form-control", required: true,
+                      data: { premium_target: "effectivity", action: "change->premium#recalculate" } %>
+                  <small class="form-text text-muted">Contract start date</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :expiry, class: "form-label fw-bold" %>
+                  <%= f.date_field :expiry, class: "form-control", required: true,
+                      data: { premium_target: "expiry", action: "change->premium#recalculate" } %>
+                  <small class="form-text text-muted">Contract end date</small>
+                </div>
+
+                <div class="mb-3">
+                  <%= f.label :premium, "Premium (Calculated)", class: "form-label fw-bold" %>
+                  <div class="p-3 rounded" style="background-color: #F9CB25;">
+                    <p class="fs-5 fw-bold mb-0" style="color: #031249;" data-premium-target="premiumPreview">
+                      ₱0.00
+                    </p>
+                  </div>
+                  <%= f.hidden_field :premium, value: 0, data: { premium_target: "premiumInput" } %>
+                  <small class="form-text text-muted">Premium is calculated automatically based on inputs above</small>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
-            <% if @insured.is_a?(Individual) %>
-              <strong>Note:</strong> For individual contracts, select an agreement contract and manually enter the rate for premium calculation.
-            <% else %>
+            <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
               <strong>Note:</strong> First select the agreement type (Rate or Contract), then select the specific agreement.
-            <% end %>
-          </div>
+            </div>
+          <% end %>
 
           <div class="mt-4">
             <%= f.submit "Create Insurance Contract", class: "btn text-white", style: "background-color: #002C88;" %>

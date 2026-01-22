@@ -1,10 +1,214 @@
-<p style="color: green"><%= notice %></p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% end %>
 
-<%= render @insurance_group %>
+  <div class="mb-3">
+    <%= link_to "← Back to insurance groups", insurance_groups_path, class: "text-decoration-none", style: "color: #CCCCCC;" %>
+  </div>
 
-<div>
-  <%= link_to "Edit this insurance group", edit_insurance_group_path(@insurance_group) %> |
-  <%= link_to "Back to insurance groups", insurance_groups_path %>
+  <div class="card">
+    <div class="card-header text-white" style="background-color: #002C88;">
+      <h2 class="mb-0">Insurance Group Details</h2>
+      <small class="text-white-50">Group #<%= @insurance_group.id %></small>
+    </div>
+    <div class="card-body">
+      <!-- Group Information -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title" style="color: #002C88;">Cooperative Information</h5>
+              <p class="mb-2">
+                <strong>Cooperative Name:</strong><br>
+                <span class="fs-5"><%= @insurance_group.cooperative&.name || 'N/A' %></span>
+              </p>
+              <% if @insurance_group.cooperative %>
+                <p class="mb-1 text-muted">
+                  <small>
+                    <strong>Region:</strong> <%= @insurance_group.cooperative.region&.name || 'N/A' %><br>
+                    <strong>Province:</strong> <%= @insurance_group.cooperative.province&.name || 'N/A' %><br>
+                    <strong>Municipal:</strong> <%= @insurance_group.cooperative.municipal&.name || 'N/A' %><br>
+                    <strong>Barangay:</strong> <%= @insurance_group.cooperative.barangay&.name || 'N/A' %>
+                  </small>
+                </p>
+              <% end %>
+            </div>
+          </div>
+        </div>
 
-  <%= button_to "Destroy this insurance group", @insurance_group, method: :delete %>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title" style="color: #002C88;">Agreement Contract</h5>
+              <p class="mb-2">
+                <strong>Contract ID:</strong> #<%= @insurance_group.contract&.id || 'N/A' %>
+              </p>
+              <% if @insurance_group.contract %>
+                <p class="mb-2">
+                  <strong>Insurance Product:</strong><br>
+                  <span class="fs-5"><%= @insurance_group.contract.insurance_product&.name || 'N/A' %></span>
+                </p>
+                <p class="mb-0">
+                  <strong>Product Type:</strong><br>
+                  <span class="badge" style="background-color: #F9CB25; color: #031249;">
+                    <%= @insurance_group.contract.insurance_product&.product_type || 'N/A' %>
+                  </span>
+                </p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members Section -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #031249; color: #FDFDFD;">
+          <h5 class="mb-0">Cooperative Members</h5>
+          <span class="badge" style="background-color: #F9CB25; color: #031249;">
+            <%= @members.count %> Members
+          </span>
+        </div>
+        <div class="card-body">
+          <% if @members.empty? %>
+            <div class="text-center py-4">
+              <p class="text-muted mb-3">No members in this cooperative yet</p>
+              <%= link_to "Add Members", coop_memberships_path, class: "btn text-white", style: "background-color: #002C88;" %>
+            </div>
+          <% else %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead style="background-color: #FDFDFD; color: #031249;">
+                  <tr>
+                    <th>Member ID</th>
+                    <th>Full Name</th>
+                    <th>Birth Date</th>
+                    <th>Gender</th>
+                    <th>Membership Date</th>
+                    <th class="text-end">Insurance Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @members.each do |membership| %>
+                    <% 
+                      # Check if this member has a contract using this insurance group's rates
+                      rate_ids = @insurance_group.contract.agreement_rates.pluck(:id)
+                      has_contract = InsuranceContract.exists?(
+                        insured_type: 'CoopMembership',
+                        insured_id: membership.id,
+                        agreement_type: 'Agreement::Rate',
+                        agreement_id: rate_ids
+                      )
+                    %>
+                    <tr>
+                      <td>#<%= membership.id %></td>
+                      <td><strong><%= membership.individual&.full_name || 'N/A' %></strong></td>
+                      <td><%= membership.individual&.birth_date&.strftime("%m/%d/%Y") || 'N/A' %></td>
+                      <td><%= membership.individual&.gender || 'N/A' %></td>
+                      <td><%= membership.membership_date&.strftime("%m/%d/%Y") || 'N/A' %></td>
+                      <td class="text-end">
+                        <% if has_contract %>
+                          <span class="badge" style="background-color: #002C88; color: #FDFDFD;">Insured</span>
+                        <% else %>
+                          <span class="badge" style="background-color: #CCCCCC; color: #031249;">Not Insured</span>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Create Insurance Contracts Section -->
+      <div class="card mb-4" style="border: 2px solid #F9CB25;">
+        <div class="card-header text-white" style="background-color: #F9CB25; color: #031249;">
+          <h5 class="mb-0" style="color: #031249;">
+            <strong>Create Insurance Contracts for Members</strong>
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">
+            Create insurance contracts for members of this cooperative based on the selected agreement contract rates.
+          </p>
+          <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;">
+            <strong>Note:</strong> You can create individual insurance contracts for each member. 
+            The system will use the agreement rates associated with the selected contract.
+          </div>
+          <%= link_to "Create Insurance Contract", new_insurance_group_insurance_contract_path(@insurance_group), 
+              class: "btn text-white", style: "background-color: #002C88;" %>
+        </div>
+      </div>
+
+      <!-- Existing Insurance Contracts -->
+      <div class="card">
+        <div class="card-header" style="background-color: #031249; color: #FDFDFD;">
+          <h5 class="mb-0">Insurance Contracts in This Group</h5>
+        </div>
+        <div class="card-body">
+          <% group_contracts = @insurance_group.member_contracts.includes(insured: :individual) %>
+          <% if group_contracts.empty? %>
+            <div class="text-center py-4">
+              <p class="text-muted mb-0">No insurance contracts created yet</p>
+            </div>
+          <% else %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead style="background-color: #FDFDFD; color: #031249;">
+                  <tr>
+                    <th>Contract ID</th>
+                    <th>Member</th>
+                    <th>Age</th>
+                    <th>Amount Covered</th>
+                    <th>Premium</th>
+                    <th>Rate</th>
+                    <th>Period</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% group_contracts.each do |contract| %>
+                    <tr>
+                      <td>#<%= contract.id %></td>
+                      <td>
+                        <% if contract.insured.is_a?(CoopMembership) %>
+                          <%= contract.insured.individual&.full_name || 'N/A' %>
+                        <% else %>
+                          <%= contract.insured_type %>
+                        <% end %>
+                      </td>
+                      <td><%= contract.age %></td>
+                      <td><%= number_to_currency(contract.amount_covered) %></td>
+                      <td><%= number_to_currency(contract.premium) %></td>
+                      <td><%= number_with_precision(contract.rate, precision: 2) %>%</td>
+                      <td>
+                        <%= contract.effectivity&.strftime("%m/%d/%Y") %> - 
+                        <%= contract.expiry&.strftime("%m/%d/%Y") %>
+                      </td>
+                      <td class="text-end">
+                        <%= link_to "View", [contract.insured, contract], class: "btn btn-sm", style: "background-color: #002C88; color: #FDFDFD;" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <%= link_to "Edit this group", edit_insurance_group_path(@insurance_group), class: "btn text-white", style: "background-color: #002C88;" %>
+        <%= link_to "Back to groups", insurance_groups_path, class: "btn text-white", style: "background-color: #CCCCCC; color: #031249;" %>
+        <%= button_to "Delete this group", @insurance_group, method: :delete,
+            data: { confirm: "Are you sure you want to delete this insurance group?" },
+            class: "btn text-white", style: "background-color: #A80F21;" %>
+      </div>
+    </div>
+  </div>
 </div>

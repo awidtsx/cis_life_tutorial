@@ -3,68 +3,33 @@ class InsuranceContractsController < ApplicationController
   before_action :set_insurance_contract, only: %i[ show edit update destroy ]
   before_action :load_contract, only: %i[ new create edit update ]
   
-  # GET /insurance_contracts or /insurance_contracts.json
   def index
     @insurance_contracts = InsuranceContract.all
   end
 
-  # GET /insurance_contracts/1 or /insurance_contracts/1.json
   def show
   end
 
-  # GET /insurance_contracts/new
   def new
-    @insurance_contract = @insured.insurance_contracts.build
+    @insurance_contract = if @insured.is_a?(InsuranceGroup)
+      InsuranceContract.new
+    else
+      @insured.insurance_contracts.build
+    end
   end
 
-  # GET /insurance_contracts/1/edit
   def edit
   end
 
-  # POST /insurance_contracts or /insurance_contracts.json
   def create
-    @insurance_contract = @insured.insurance_contracts.build(insurance_contract_params)
-    
-    # Calculate premium and store rate based on insured type
-    if @insurance_contract.amount_covered.present? && 
-       @insurance_contract.effectivity.present? && 
-       @insurance_contract.expiry.present?
-      
-      term = calculate_term(@insurance_contract.effectivity, @insurance_contract.expiry)
-      rate = 0
-      
-      if @insured.is_a?(Individual)
-        # For individuals, use custom rate from params and store it
-        if params[:insurance_contract][:custom_rate].present?
-          rate = params[:insurance_contract][:custom_rate].to_f
-          @insurance_contract.rate = rate
-        end
-      else
-        # For coop memberships, get rate from agreement and store it
-        if @insurance_contract.agreement_type == 'Agreement::Rate' && @insurance_contract.agreement
-          rate = @insurance_contract.agreement.rate.to_f
-          @insurance_contract.rate = rate
-        end
-      end
-      
-      # Calculate premium: (amount_covered / 1000) * rate * term
-      @insurance_contract.premium = (@insurance_contract.amount_covered.to_f / 1000) * rate * term
-    end
-
-    respond_to do |format|
-      if @insurance_contract.save
-        format.html { redirect_to [@insured, @insurance_contract], notice: "Insurance contract was successfully created." }
-        format.json { render :show, status: :created }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @insurance_contract.errors, status: :unprocessable_entity }
-      end
+    if @insured.is_a?(InsuranceGroup)
+      create_group_member_contract
+    else
+      create_individual_contract
     end
   end
 
-  # PATCH/PUT /insurance_contracts/1 or /insurance_contracts/1.json
   def update
-    # Calculate premium and rate before updating
     if insurance_contract_params[:amount_covered].present? && 
        insurance_contract_params[:effectivity].present? && 
        insurance_contract_params[:expiry].present?
@@ -80,7 +45,6 @@ class InsuranceContractsController < ApplicationController
           rate = params[:insurance_contract][:custom_rate].to_f
         end
       else
-        # Get the agreement to find the rate
         agreement_id = insurance_contract_params[:agreement_id]
         agreement_type = insurance_contract_params[:agreement_type]
         
@@ -92,7 +56,6 @@ class InsuranceContractsController < ApplicationController
       
       premium = (insurance_contract_params[:amount_covered].to_f / 1000) * rate * term
       
-      # Merge the calculated premium and rate into params
       params_with_calculations = insurance_contract_params.to_h.merge(
         premium: premium,
         rate: rate
@@ -120,7 +83,6 @@ class InsuranceContractsController < ApplicationController
     end
   end
 
-  # DELETE /insurance_contracts/1 or /insurance_contracts/1.json
   def destroy
     @insurance_contract.destroy!
 
@@ -134,7 +96,12 @@ class InsuranceContractsController < ApplicationController
     @agreement_rates = Agreement::Rate.order(:age_from)
     @agreement_contracts = Agreement::Contract.includes(:contractable, :insurance_product).order(:id)
     
-    # If insured is an Individual, load only contracts that match the individual
+    if @insured.is_a?(InsuranceGroup)
+      @group_contract = @insured.contract
+      @available_rates = @group_contract&.agreement_rates || []
+      @members = @insured.cooperative.coop_memberships.includes(:individual)
+    end
+    
     if @insured.is_a?(Individual)
       @individual_contracts = Agreement::Contract
         .where(contractable_type: 'Individual', contractable_id: @insured.id)
@@ -144,7 +111,6 @@ class InsuranceContractsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_insurance_contract
       @insurance_contract = InsuranceContract.find(params[:id])
     end
@@ -154,6 +120,8 @@ class InsuranceContractsController < ApplicationController
         @insured = Individual.find(params[:individual_id])
       elsif params[:coop_membership_id]
         @insured = CoopMembership.find(params[:coop_membership_id])
+      elsif params[:insurance_group_id]
+        @insured = InsuranceGroup.find(params[:insurance_group_id])
       else
         raise ActiveRecord::RecordNotFound, "Insured not found"
       end
@@ -164,8 +132,92 @@ class InsuranceContractsController < ApplicationController
       (end_date.year * 12 + end_date.month) - (start_date.year * 12 + start_date.month)
     end
 
-    # Only allow a list of trusted parameters through.
+    def create_individual_contract
+      @insurance_contract = @insured.insurance_contracts.build(insurance_contract_params)
+      
+      if @insurance_contract.amount_covered.present? && 
+         @insurance_contract.effectivity.present? && 
+         @insurance_contract.expiry.present?
+        
+        term = calculate_term(@insurance_contract.effectivity, @insurance_contract.expiry)
+        rate = 0
+        
+        if @insured.is_a?(Individual)
+          if params[:insurance_contract][:custom_rate].present?
+            rate = params[:insurance_contract][:custom_rate].to_f
+            @insurance_contract.rate = rate
+          end
+        else
+          if @insurance_contract.agreement_type == 'Agreement::Rate' && @insurance_contract.agreement
+            rate = @insurance_contract.agreement.rate.to_f
+            @insurance_contract.rate = rate
+          end
+        end
+        
+        @insurance_contract.premium = (@insurance_contract.amount_covered.to_f / 1000) * rate * term
+      end
+
+      respond_to do |format|
+        if @insurance_contract.save
+          format.html { redirect_to [@insured, @insurance_contract], notice: "Insurance contract was successfully created." }
+          format.json { render :show, status: :created }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: @insurance_contract.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+
+    def create_group_member_contract
+      coop_membership_id = params[:insurance_contract][:coop_membership_id]
+      
+      unless coop_membership_id.present?
+        @insurance_contract = InsuranceContract.new(insurance_contract_params)
+        @insurance_contract.errors.add(:coop_membership_id, "must be selected")
+        respond_to do |format|
+          format.html { render :new, status: :unprocessable_entity }
+        end
+        return
+      end
+      
+      coop_membership = CoopMembership.find(coop_membership_id)
+      
+      # Build the insurance contract for the selected member
+      @insurance_contract = coop_membership.insurance_contracts.build(
+        insurance_contract_params.except(:coop_membership_id)
+      )
+      
+      if @insurance_contract.amount_covered.present? && 
+         @insurance_contract.effectivity.present? && 
+         @insurance_contract.expiry.present? &&
+         @insurance_contract.agreement_id.present?
+        
+        term = calculate_term(@insurance_contract.effectivity, @insurance_contract.expiry)
+        
+        # Get rate from Agreement::Rate
+        if @insurance_contract.agreement_type == 'Agreement::Rate'
+          agreement_rate = Agreement::Rate.find(@insurance_contract.agreement_id)
+          rate = agreement_rate.rate.to_f
+          @insurance_contract.rate = rate
+          @insurance_contract.premium = (@insurance_contract.amount_covered.to_f / 1000) * rate * term
+        end
+      end
+
+      respond_to do |format|
+        if @insurance_contract.save
+          format.html { redirect_to @insured, notice: "Insurance contract was successfully created for #{coop_membership.individual.full_name}." }
+          format.json { render :show, status: :created }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: @insurance_contract.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+
     def insurance_contract_params
-      params.require(:insurance_contract).permit(:agreement_id, :agreement_type, :age, :amount_covered, :premium, :rate, :effectivity, :expiry)
+      params.require(:insurance_contract).permit(
+        :agreement_id, :agreement_type, :age, :amount_covered, 
+        :premium, :rate, :effectivity, :expiry, :coop_membership_id
+      )
     end
 end

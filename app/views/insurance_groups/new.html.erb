@@ -1,9 +1,99 @@
-<h1>New insurance group</h1>
+<div class="container mt-4">
+  <div class="mb-3">
+    <%= link_to "← Back to insurance groups", insurance_groups_path, class: "text-decoration-none", style: "color: #CCCCCC;" %>
+  </div>
 
-<%= render "form", insurance_group: @insurance_group %>
+  <div class="card">
+    <div class="card-header text-white" style="background-color: #002C88;">
+      <h2 class="mb-0">New Insurance Group</h2>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @insurance_group, local: true) do |f| %>
+        <% if @insurance_group.errors.any? %>
+          <div class="alert alert-danger" role="alert">
+            <h4><%= pluralize(@insurance_group.errors.count, "error") %> prohibited this insurance group from being saved:</h4>
+            <ul class="mb-0">
+              <% @insurance_group.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-<br>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="field mb-3">
+              <%= f.label :cooperative_id, "Cooperative", class: "form-label fw-bold" %>
+              <%= f.select :cooperative_id,
+                    options_from_collection_for_select(@cooperatives, :id, :name, @insurance_group.cooperative_id),
+                    { prompt: "Select a cooperative" },
+                    { id: "cooperative_select", class: "form-select", required: true } %>
+              <small class="form-text text-muted">Select the cooperative for this insurance group</small>
+            </div>
+          </div>
 
-<div>
-  <%= link_to "Back to insurance groups", insurance_groups_path %>
+          <div class="col-md-6">
+            <div class="field mb-3">
+              <%= f.label :contract_id, "Agreement Contract", class: "form-label fw-bold" %>
+              <%= f.select :contract_id,
+                    grouped_options_for_select(
+                      @agreement_contracts.group_by { |c| c.insurance_product&.name }.map do |product_name, contracts|
+                        [
+                          product_name || 'No Product',
+                          contracts.map { |c| ["Contract ##{c.id} - #{c.contractable_name} (#{c.insurance_product&.name})", c.id] }
+                        ]
+                      end,
+                      @insurance_group.contract_id
+                    ),
+                    { prompt: "Select an agreement contract" },
+                    { id: "contract_select", class: "form-select", required: true } %>
+              <small class="form-text text-muted">Select the agreement contract for this group</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
+          <strong>Important Steps:</strong>
+          <ol class="mb-0">
+            <li>Select the cooperative that will be covered by this insurance group</li>
+            <li>Choose an agreement contract that matches the cooperative</li>
+            <li>After creating the group, you'll be able to add individual insurance contracts for each member</li>
+          </ol>
+        </div>
+
+        <div class="mt-4">
+          <%= f.submit "Create Insurance Group", class: "btn text-white", style: "background-color: #002C88;" %>
+          <%= link_to "Cancel", insurance_groups_path, class: "btn text-white", style: "background-color: #A80F21;" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Help Cards -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title" style="color: #002C88;">
+            What is an Insurance Group?
+          </h5>
+          <p class="card-text text-muted">
+            An insurance group links a cooperative with an agreement contract. This allows you to create insurance contracts for all members of the cooperative using standardized rates.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title" style="color: #002C88;">
+            Next Steps
+          </h5>
+          <p class="card-text text-muted">
+            After creating the insurance group, you can navigate to the group details page to create individual insurance contracts for each cooperative member.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

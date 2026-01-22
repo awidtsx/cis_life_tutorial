@@ -2,7 +2,9 @@ Rails.application.routes.draw do
   get 'dashboard/index'
   get "/dashboard", to: "dashboard#index"
   get 'auth/index'
-  resources :insurance_groups
+  resources :insurance_groups do
+  resources :insurance_contracts, only: [:new, :create]
+  end
   resources :insurance_contracts
   resources :coop_memberships do
     resources :insurance_contracts
@@ -47,4 +49,7 @@ end
 
   # Defines the root path route ("/")
   # root "posts#index"
+  get 'cooperatives/provinces_for_region', to: 'cooperatives#provinces_for_region'
+get 'cooperatives/municipals_for_province', to: 'cooperatives#municipals_for_province'
+get 'cooperatives/barangays_for_municipal', to: 'cooperatives#barangays_for_municipal'
 end

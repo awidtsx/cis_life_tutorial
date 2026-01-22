@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_21_015603) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_21_081154) do
   create_table "add_barangays", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.bigint "add_municipal_id", null: false
@@ -117,7 +117,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_21_015603) do
   end
 
   create_table "insurance_groups", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "insurance_contract_id", null: false
+    t.bigint "insurance_contract_id"
     t.bigint "cooperative_id", null: false
     t.bigint "contract_id", null: false
     t.datetime "created_at", null: false

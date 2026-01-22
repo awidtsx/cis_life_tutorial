@@ -1,14 +1,114 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Insurance groups</h1>
-
-<div id="insurance_groups">
-  <% @insurance_groups.each do |insurance_group| %>
-    <%= render insurance_group %>
-    <p>
-      <%= link_to "Show this insurance group", insurance_group %>
-    </p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
-</div>
 
-<%= link_to "New insurance group", new_insurance_group_path %>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold" style="color: #002C88;">Insurance Groups</h1>
+    <%= link_to "New Insurance Group", new_insurance_group_path, class: "btn text-white", style: "background-color: #002C88;" %>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @insurance_groups.empty? %>
+        <div class="text-center py-5">
+          <p class="text-muted mb-3">No insurance groups found</p>
+          <%= link_to "Create your first insurance group", new_insurance_group_path, class: "btn text-white", style: "background-color: #002C88;" %>
+        </div>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead style="background-color: #002C88; color: #FDFDFD;">
+              <tr>
+                <th>Group ID</th>
+                <th>Cooperative</th>
+                <th>Agreement Contract</th>
+                <th>Insurance Product</th>
+                <th>Members</th>
+                <th>Insured Members</th>
+                <th>Created At</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @insurance_groups.each do |insurance_group| %>
+                <% members_count = insurance_group.cooperative&.coop_memberships&.count || 0 %>
+                <% insured_count = insurance_group.member_contracts.count %>
+                <tr>
+                  <td><strong>#<%= insurance_group.id %></strong></td>
+                  <td><%= insurance_group.cooperative&.name || 'N/A' %></td>
+                  <td>#<%= insurance_group.contract&.id || 'N/A' %></td>
+                  <td><%= insurance_group.contract&.insurance_product&.name || 'N/A' %></td>
+                  <td>
+                    <span class="badge" style="background-color: #F9CB25; color: #031249;">
+                      <%= members_count %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge <%= insured_count > 0 ? 'text-white' : '' %>" style="background-color: <%= insured_count > 0 ? '#002C88' : '#CCCCCC' %>; color: <%= insured_count > 0 ? '#FDFDFD' : '#031249' %>;">
+                      <%= insured_count %> / <%= members_count %>
+                    </span>
+                  </td>
+                  <td><%= insurance_group.created_at.strftime("%B %d, %Y") %></td>
+                  <td class="text-end">
+                    <%= link_to "View", insurance_group, class: "btn btn-sm", style: "background-color: #002C88; color: #FDFDFD;" %>
+                    <%= link_to "Edit", edit_insurance_group_path(insurance_group), class: "btn btn-sm", style: "background-color: #CCCCCC; color: #031249;" %>
+                    <%= button_to "Delete", insurance_group, method: :delete, 
+                        data: { confirm: "Are you sure you want to delete this insurance group?" }, 
+                        class: "btn btn-sm text-white", style: "background-color: #A80F21;" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #002C88;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Groups</h6>
+          <h3 class="fw-bold mb-0"><%= @insurance_groups.count %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Members</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @insurance_groups.sum { |g| g.cooperative&.coop_memberships&.count || 0 } %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #F9CB25; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Insured Members</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @insurance_groups.sum { |g| g.member_contracts.count } %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #CCCCCC; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Coverage Rate</h6>
+          <% total_members = @insurance_groups.sum { |g| g.cooperative&.coop_memberships&.count || 0 } %>
+          <% insured_members = @insurance_groups.sum { |g| g.member_contracts.count } %>
+          <% coverage_rate = total_members > 0 ? (insured_members.to_f / total_members * 100).round(1) : 0 %>
+          <h3 class="fw-bold mb-0"><%= coverage_rate %>%</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
