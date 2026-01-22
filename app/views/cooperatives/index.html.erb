@@ -1,26 +1,109 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Cooperatives</h1>
-
-<div id="cooperatives">
-  <% @cooperatives.each do |cooperative| %>
-    <h3><%= cooperative.name %></h2>
-    <strong>Region:</strong>
-    <%= cooperative.region.name %>
-    <br>
-    <strong>Province:</strong>
-    <%= cooperative.province.name %>
-    <br>
-    <strong>Municipal:</strong>
-    <%= cooperative.municipal.name %>
-    <br>
-    <strong>Barangay:</strong>
-    <%= cooperative.barangay.name %>
-    <br>
-    <p>
-      <%= link_to "Show this cooperative", cooperative %>
-    </p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
-</div>
 
-<%= link_to "New cooperative", new_cooperative_path %>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold" style="color: #002C88;">Cooperatives</h1>
+    <%= link_to "New Cooperative", new_cooperative_path, class: "btn text-white", style: "background-color: #002C88;" %>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @cooperatives.empty? %>
+        <div class="text-center py-5">
+          <p class="text-muted mb-3">No cooperatives found</p>
+          <%= link_to "Create your first cooperative", new_cooperative_path, class: "btn text-white", style: "background-color: #002C88;" %>
+        </div>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead style="background-color: #002C88; color: #FDFDFD;">
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Region</th>
+                <th>Province</th>
+                <th>Municipal</th>
+                <th>Barangay</th>
+                <th>Members</th>
+                <th>Created At</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @cooperatives.each do |cooperative| %>
+                <% members_count = cooperative.coop_memberships.count %>
+                <tr>
+                  <td><strong>#<%= cooperative.id %></strong></td>
+                  <td><strong><%= cooperative.name %></strong></td>
+                  <td><%= cooperative.region&.name || 'N/A' %></td>
+                  <td><%= cooperative.province&.name || 'N/A' %></td>
+                  <td><%= cooperative.municipal&.name || 'N/A' %></td>
+                  <td><%= cooperative.barangay&.name || 'N/A' %></td>
+                  <td>
+                    <span class="badge" style="background-color: #F9CB25; color: #031249;">
+                      <%= members_count %>
+                    </span>
+                  </td>
+                  <td><%= cooperative.created_at.strftime("%B %d, %Y") %></td>
+                  <td class="text-end">
+                    <%= link_to "View", cooperative, class: "btn btn-sm", style: "background-color: #002C88; color: #FDFDFD;" %>
+                    <%= link_to "Edit", edit_cooperative_path(cooperative), class: "btn btn-sm", style: "background-color: #CCCCCC; color: #031249;" %>
+                    <%= button_to "Delete", cooperative, method: :delete, 
+                        data: { confirm: "Are you sure you want to delete this cooperative?" }, 
+                        class: "btn btn-sm text-white", style: "background-color: #A80F21;" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #002C88;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Cooperatives</h6>
+          <h3 class="fw-bold mb-0"><%= @cooperatives.count %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Members</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @cooperatives.sum { |c| c.coop_memberships.count } %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #F9CB25; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Regions Covered</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @cooperatives.pluck(:add_region_id).compact.uniq.count %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #CCCCCC; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Avg Members/Coop</h6>
+          <% avg_members = @cooperatives.count > 0 ? (@cooperatives.sum { |c| c.coop_memberships.count }.to_f / @cooperatives.count).round(1) : 0 %>
+          <h3 class="fw-bold mb-0"><%= avg_members %></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

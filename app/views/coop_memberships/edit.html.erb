@@ -1,10 +1,150 @@
-<h1>Editing coop membership</h1>
+<div class="container mt-4">
+  <div class="mb-3">
+    <%= link_to "← Back to membership", @coop_membership, class: "text-decoration-none", style: "color: #CCCCCC;" %>
+  </div>
 
-<%= render "form", coop_membership: @coop_membership %>
+  <div class="card">
+    <div class="card-header text-white" style="background-color: #002C88;">
+      <h2 class="mb-0">Edit Cooperative Membership</h2>
+      <small class="text-white-50">Membership #<%= @coop_membership.id %></small>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @coop_membership, local: true) do |f| %>
+        <% if @coop_membership.errors.any? %>
+          <div class="alert alert-danger" role="alert">
+            <h4><%= pluralize(@coop_membership.errors.count, "error") %> prohibited this membership from being saved:</h4>
+            <ul class="mb-0">
+              <% @coop_membership.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-<br>
+        <div class="row">
+          <!-- Cooperative Selection -->
+          <div class="col-md-6">
+            <div class="card mb-4" style="border: 2px solid #F9CB25;">
+              <div class="card-header" style="background-color: #F9CB25; color: #031249;">
+                <h5 class="mb-0 fw-bold">Cooperative Information</h5>
+              </div>
+              <div class="card-body">
+                <div class="field mb-3">
+                  <%= f.label :cooperative_id, "Cooperative", class: "form-label fw-bold" %>
+                  <%= f.select :cooperative_id,
+                        grouped_options_for_select(
+                          Cooperative.includes(:region, :province, :municipal).order(:name).group_by { |c| c.region&.name || 'No Region' }.map do |region, coops|
+                            [
+                              region,
+                              coops.map { |c| [
+                                "#{c.name} (#{c.municipal&.name}, #{c.province&.name})",
+                                c.id
+                              ] }
+                            ]
+                          end,
+                          @coop_membership.cooperative_id
+                        ),
+                        { prompt: "Select a cooperative" },
+                        { id: "cooperative_select", class: "form-select", required: true } %>
+                  <small class="form-text text-muted">Choose the cooperative this person belongs to</small>
+                </div>
 
-<div>
-  <%= link_to "Show this coop membership", @coop_membership %> |
-  <%= link_to "Back to coop memberships", coop_memberships_path %>
+                <% if @coop_membership.cooperative %>
+                  <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;">
+                    <strong>Current Cooperative:</strong><br>
+                    <%= @coop_membership.cooperative.name %><br>
+                    <small class="text-muted">
+                      <%= [
+                        @coop_membership.cooperative.barangay&.name,
+                        @coop_membership.cooperative.municipal&.name,
+                        @coop_membership.cooperative.province&.name,
+                        @coop_membership.cooperative.region&.name
+                      ].compact.join(', ') %>
+                    </small>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Individual Selection -->
+          <div class="col-md-6">
+            <div class="card mb-4" style="border: 2px solid #002C88;">
+              <div class="card-header text-white" style="background-color: #002C88;">
+                <h5 class="mb-0">Member Information</h5>
+              </div>
+              <div class="card-body">
+                <div class="field mb-3">
+                  <%= f.label :individual_id, "Individual", class: "form-label fw-bold" %>
+                  <%= f.select :individual_id,
+                        grouped_options_for_select(
+                          Individual.order(:last_name, :first_name).group_by(&:gender).map do |gender, individuals|
+                            [
+                              gender || 'Not Specified',
+                              individuals.map { |i| [
+                                "#{i.full_name} (#{i.birth_date&.strftime('%m/%d/%Y')})",
+                                i.id
+                              ] }
+                            ]
+                          end,
+                          @coop_membership.individual_id
+                        ),
+                        { prompt: "Select an individual" },
+                        { id: "individual_select", class: "form-select", required: true } %>
+                  <small class="form-text text-muted">Choose the person who is a member</small>
+                </div>
+
+                <% if @coop_membership.individual %>
+                  <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;">
+                    <strong>Current Member:</strong><br>
+                    <%= @coop_membership.individual.full_name %><br>
+                    <small class="text-muted">
+                      Born: <%= @coop_membership.individual.birth_date&.strftime('%B %d, %Y') %><br>
+                      Gender: <%= @coop_membership.individual.gender %>
+                    </small>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Membership Date -->
+        <div class="card mb-4" style="border: 2px solid #031249;">
+          <div class="card-header text-white" style="background-color: #031249;">
+            <h5 class="mb-0">Membership Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="field mb-3">
+                  <%= f.label :membership_date, "Membership Date", class: "form-label fw-bold" %>
+                  <%= f.date_field :membership_date, class: "form-control", required: true %>
+                  <small class="form-text text-muted">Date when this person officially became a member</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="alert" style="background-color: #F9CB25; border: none; color: #031249; margin-top: 32px;">
+                  <strong>Current:</strong> <%= @coop_membership.membership_date&.strftime("%B %d, %Y") || 'Not set' %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert" style="background-color: #FDFDFD; border: 1px solid #F9CB25; color: #031249;" role="alert">
+          <strong>Warning:</strong> Changing the cooperative or individual may affect existing insurance contracts associated with this membership.
+        </div>
+
+        <div class="mt-4">
+          <%= f.submit "Update Membership", class: "btn text-white", style: "background-color: #002C88;" %>
+          <%= link_to "Cancel", @coop_membership, class: "btn text-white", style: "background-color: #A80F21;" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <%= link_to "View details", @coop_membership, class: "text-decoration-none" %>
+  </div>
 </div>

@@ -1,10 +1,116 @@
-<h1>Editing cooperative</h1>
+<div class="container mt-4">
+  <div class="mb-3">
+    <%= link_to "← Back to cooperative", @cooperative, class: "text-decoration-none", style: "color: #CCCCCC;" %>
+  </div>
 
-<%= render "form", cooperative: @cooperative %>
+  <div class="card">
+    <div class="card-header text-white" style="background-color: #002C88;">
+      <h2 class="mb-0">Edit Cooperative</h2>
+      <small class="text-white-50">Cooperative #<%= @cooperative.id %></small>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @cooperative, local: true) do |f| %>
+        <% if @cooperative.errors.any? %>
+          <div class="alert alert-danger" role="alert">
+            <h4><%= pluralize(@cooperative.errors.count, "error") %> prohibited this cooperative from being saved:</h4>
+            <ul class="mb-0">
+              <% @cooperative.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-<br>
+        <!-- Basic Information -->
+        <div class="card mb-4" style="border: 2px solid #F9CB25;">
+          <div class="card-header" style="background-color: #F9CB25; color: #031249;">
+            <h5 class="mb-0 fw-bold">Basic Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <%= f.label :name, class: "form-label fw-bold" %>
+              <%= f.text_field :name, autofocus: true, class: "form-control", required: true, placeholder: "Enter cooperative name" %>
+              <small class="form-text text-muted">Provide the full legal name of the cooperative</small>
+            </div>
+          </div>
+        </div>
 
-<div>
-  <%= link_to "Show this cooperative", @cooperative %> |
-  <%= link_to "Back to cooperatives", cooperatives_path %>
+        <!-- Location Information -->
+        <div class="card mb-4" style="border: 2px solid #002C88;">
+          <div class="card-header text-white" style="background-color: #002C88;">
+            <h5 class="mb-0">Location Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="field mb-3">
+                  <%= f.label :add_region_id, "Region", class: "form-label fw-bold" %>
+                  <%= f.select :add_region_id,
+                        options_from_collection_for_select(AddRegion.order(:name), :id, :name, @cooperative.add_region_id),
+                        { prompt: "Select a region" },
+                        { id: "region_select", class: "form-select", required: true } %>
+                  <small class="form-text text-muted">Select the region where the cooperative is located</small>
+                </div>
+
+                <div class="field mb-3">
+                  <%= f.label :add_province_id, "Province", class: "form-label fw-bold" %>
+                  <%= f.select :add_province_id,
+                        options_from_collection_for_select(
+                          @cooperative.add_region_id ? AddProvince.where(add_region_id: @cooperative.add_region_id).order(:name) : [],
+                          :id, :name, @cooperative.add_province_id
+                        ),
+                        { prompt: "Select a province" },
+                        { id: "province_select", class: "form-select", required: true } %>
+                  <small class="form-text text-muted">Province will be available after selecting a region</small>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="field mb-3">
+                  <%= f.label :add_municipal_id, "Municipal", class: "form-label fw-bold" %>
+                  <%= f.select :add_municipal_id,
+                        options_from_collection_for_select(
+                          @cooperative.add_province_id ? AddMunicipal.where(add_province_id: @cooperative.add_province_id).order(:name) : [],
+                          :id, :name, @cooperative.add_municipal_id
+                        ),
+                        { prompt: "Select a municipal" },
+                        { id: "municipal_select", class: "form-select", required: true } %>
+                  <small class="form-text text-muted">Municipality will be available after selecting a province</small>
+                </div>
+
+                <div class="field mb-3">
+                  <%= f.label :add_barangay_id, "Barangay", class: "form-label fw-bold" %>
+                  <%= f.select :add_barangay_id,
+                        options_from_collection_for_select(
+                          @cooperative.add_municipal_id ? AddBarangay.where(add_municipal_id: @cooperative.add_municipal_id).order(:name) : [],
+                          :id, :name, @cooperative.add_barangay_id
+                        ),
+                        { prompt: "Select a barangay" },
+                        { id: "barangay_select", class: "form-select", required: true } %>
+                  <small class="form-text text-muted">Barangay will be available after selecting a municipality</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
+              <strong>Location Selection:</strong> Please select location fields in order: Region → Province → Municipal → Barangay. Each field will be enabled once the previous selection is made.
+            </div>
+          </div>
+        </div>
+
+        <div class="alert" style="background-color: #FDFDFD; border: 1px solid #F9CB25; color: #031249;" role="alert">
+          <strong>Warning:</strong> Changing the cooperative's location may affect existing memberships and contracts.
+        </div>
+
+        <div class="mt-4">
+          <%= f.submit "Update Cooperative", class: "btn text-white", style: "background-color: #002C88;" %>
+          <%= link_to "Cancel", @cooperative, class: "btn text-white", style: "background-color: #A80F21;" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <%= link_to "View details", @cooperative, class: "text-decoration-none" %>
+  </div>
 </div>

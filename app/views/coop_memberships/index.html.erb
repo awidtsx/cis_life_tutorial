@@ -1,15 +1,118 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Coop memberships</h1>
-
-<div id="coop_memberships">
-  <% @coop_memberships.each do |coop_membership| %>
-    <strong>Cooperative:</strong> <%= coop_membership.cooperative&.name %><br>
-    <strong>Indivudual:</strong> <%= coop_membership.individual&.full_name %><br>
-    <p>
-      <%= link_to "Show this coop membership", coop_membership %>
-    </p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
-</div>
 
-<%= link_to "New coop membership", new_coop_membership_path %>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold" style="color: #002C88;">Cooperative Memberships</h1>
+    <%= link_to "New Membership", new_coop_membership_path, class: "btn text-white", style: "background-color: #002C88;" %>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @coop_memberships.empty? %>
+        <div class="text-center py-5">
+          <p class="text-muted mb-3">No cooperative memberships found</p>
+          <%= link_to "Create your first membership", new_coop_membership_path, class: "btn text-white", style: "background-color: #002C88;" %>
+        </div>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead style="background-color: #002C88; color: #FDFDFD;">
+              <tr>
+                <th>ID</th>
+                <th>Cooperative</th>
+                <th>Member Name</th>
+                <th>Birth Date</th>
+                <th>Gender</th>
+                <th>Membership Date</th>
+                <th>Insurance Contracts</th>
+                <th>Created At</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @coop_memberships.each do |membership| %>
+                <% contracts_count = membership.insurance_contracts.count %>
+                <tr>
+                  <td><strong>#<%= membership.id %></strong></td>
+                  <td>
+                    <strong><%= membership.cooperative&.name || 'N/A' %></strong><br>
+                    <small class="text-muted">
+                      <%= [
+                        membership.cooperative&.municipal&.name,
+                        membership.cooperative&.province&.name
+                      ].compact.join(', ') %>
+                    </small>
+                  </td>
+                  <td><strong><%= membership.individual&.full_name || 'N/A' %></strong></td>
+                  <td><%= membership.individual&.birth_date&.strftime("%m/%d/%Y") || 'N/A' %></td>
+                  <td><%= membership.individual&.gender || 'N/A' %></td>
+                  <td><%= membership.membership_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+                  <td>
+                    <span class="badge <%= contracts_count > 0 ? 'text-white' : '' %>" style="background-color: <%= contracts_count > 0 ? '#002C88' : '#CCCCCC' %>; color: <%= contracts_count > 0 ? '#FDFDFD' : '#031249' %>;">
+                      <%= contracts_count %>
+                    </span>
+                  </td>
+                  <td><%= membership.created_at.strftime("%B %d, %Y") %></td>
+                  <td class="text-end">
+                    <%= link_to "View", membership, class: "btn btn-sm", style: "background-color: #002C88; color: #FDFDFD;" %>
+                    <%= link_to "Edit", edit_coop_membership_path(membership), class: "btn btn-sm", style: "background-color: #CCCCCC; color: #031249;" %>
+                    <%= button_to "Delete", membership, method: :delete, 
+                        data: { confirm: "Are you sure you want to delete this membership?" }, 
+                        class: "btn btn-sm text-white", style: "background-color: #A80F21;" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #002C88;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Memberships</h6>
+          <h3 class="fw-bold mb-0"><%= @coop_memberships.count %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Unique Cooperatives</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @coop_memberships.pluck(:cooperative_id).compact.uniq.count %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #F9CB25; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">With Insurance</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @coop_memberships.select { |m| m.insurance_contracts.any? }.count %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #CCCCCC; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Contracts</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @coop_memberships.sum { |m| m.insurance_contracts.count } %>
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
