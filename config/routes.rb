@@ -19,6 +19,9 @@ Rails.application.routes.draw do
       get 'get_contract', on: :collection
     end
     resources :contracts do
+      collection do
+        get :products_for_type
+      end
       get 'get_cooperative', on: :collection
       get 'get_product', on: :collection
     end

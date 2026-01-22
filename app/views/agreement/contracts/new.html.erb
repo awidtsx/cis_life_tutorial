@@ -8,7 +8,7 @@
       <h2 class="mb-0">New Contract</h2>
     </div>
     <div class="card-body">
-      <%= form_with(model: @agreement_contract, local: true) do |f| %>
+      <%= form_with(model: @agreement_contract, local: true, html: { id: 'contract_form' }) do |f| %>
         <% if @agreement_contract.errors.any? %>
           <div class="alert alert-danger" role="alert">
             <h4><%= pluralize(@agreement_contract.errors.count, "error") %> prohibited this contract from being saved:</h4>
@@ -26,12 +26,12 @@
               <%= f.label :contractable_type, "Contract Type", class: "form-label fw-bold" %>
               <%= f.select :contractable_type,
                     options_for_select([
-                      ["Cooperative", "Cooperative"],
+                      ["Cooperative (Group)", "Cooperative"],
                       ["Individual", "Individual"]
                     ], @agreement_contract.contractable_type),
                     { prompt: "Select contract type" },
-                    { id: "contractable_type_select", class: "form-select" } %>
-              <small class="form-text text-muted">Choose whether this contract is for a cooperative or individual</small>
+                    { class: "tom-select", id: "contractable_type_select", required: true } %>
+              <small class="form-text text-muted">Choose whether this contract is for a cooperative (group) or individual</small>
             </div>
 
             <div class="field mb-3" id="cooperative_field" style="display: none;">
@@ -39,7 +39,7 @@
               <%= f.select :contractable_id,
                     options_from_collection_for_select(@cooperatives, :id, :name, @agreement_contract.contractable_id),
                     { prompt: "Select a cooperative" },
-                    { id: "cooperative_select", class: "tom-select" } %>
+                    { class: "tom-select", id: "cooperative_select" } %>
               <small class="form-text text-muted">Choose the cooperative for this contract</small>
             </div>
 
@@ -48,7 +48,7 @@
               <%= f.select :contractable_id,
                     options_from_collection_for_select(@individuals, :id, :full_name, @agreement_contract.contractable_id),
                     { prompt: "Select an individual" },
-                    { id: "individual_select", class: "tom-select" } %>
+                    { class: "tom-select", id: "individual_select" } %>
               <small class="form-text text-muted">Choose the individual for this contract</small>
             </div>
           </div>
@@ -57,20 +57,30 @@
             <div class="field mb-3">
               <%= f.label :insurance_product_id, "Insurance Product", class: "form-label fw-bold" %>
               <%= f.select :insurance_product_id,
-                    options_from_collection_for_select(@products, :id, :name, @agreement_contract.insurance_product_id),
-                    { prompt: "Select a product" },
-                    { id: "product_select", class: "tom-select" } %>
-              <small class="form-text text-muted">Select the insurance product for this contract</small>
+                    [],
+                    { prompt: "First select contract type" },
+                    { class: "tom-select", id: "product_select", required: true, 
+                      data: { products: @products.map { |p| { id: p.id, name: p.name, product_type: p.product_type } }.to_json } } %>
+              <small class="form-text text-muted" id="product_help">Select the insurance product for this contract</small>
+              <div id="product_type_warning" class="alert alert-warning mt-2" style="display: none;">
+                <strong>Note:</strong> <span id="warning_message"></span>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="alert alert-info mt-3">
-          <strong>Note:</strong> First select the contract type (Cooperative or Individual), then select the specific entity and insurance product.
+          <strong>Important:</strong> 
+          <ul class="mb-0">
+            <li>First select the <strong>Contract Type</strong></li>
+            <li>For <strong>Cooperative</strong> contracts, only <strong>Group</strong> insurance products will be available</li>
+            <li>For <strong>Individual</strong> contracts, only <strong>Individual</strong> insurance products will be available</li>
+            <li>Then select the specific cooperative or individual</li>
+          </ul>
         </div>
 
         <div class="mt-4">
-          <%= f.submit "Create Contract", class: "btn btn-primary" %>
+          <%= f.submit "Create Contract", class: "btn btn-primary", id: "submit_button" %>
           <%= link_to "Cancel", agreement_contracts_path, class: "btn btn-tertiary" %>
         </div>
       <% end %>
@@ -86,7 +96,7 @@
             <i class="bi bi-info-circle"></i> About Contracts
           </h5>
           <p class="card-text text-muted">
-            Contracts can be created for both cooperatives and individuals. Select the appropriate type and entity before submitting.
+            Contracts link cooperatives or individuals with insurance products. The product type must match the contract type.
           </p>
         </div>
       </div>

@@ -15,6 +15,12 @@ class Agreement::ContractsController < ApplicationController
   # GET /agreement/contracts/new
   def new
     @agreement_contract = Agreement::Contract.new
+    
+    # Pre-populate from params if provided
+    if params[:contractable_type].present? && params[:contractable_id].present?
+      @agreement_contract.contractable_type = params[:contractable_type]
+      @agreement_contract.contractable_id = params[:contractable_id]
+    end
   end
 
   # GET /agreement/contracts/1/edit
@@ -30,6 +36,7 @@ class Agreement::ContractsController < ApplicationController
         format.html { redirect_to @agreement_contract, notice: "Contract was successfully created." }
         format.json { render :show, status: :created, location: @agreement_contract }
       else
+        load_contract
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @agreement_contract.errors, status: :unprocessable_entity }
       end
@@ -43,6 +50,7 @@ class Agreement::ContractsController < ApplicationController
         format.html { redirect_to @agreement_contract, notice: "Contract was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @agreement_contract }
       else
+        load_contract
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @agreement_contract.errors, status: :unprocessable_entity }
       end
@@ -56,6 +64,25 @@ class Agreement::ContractsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to agreement_contracts_path, notice: "Contract was successfully destroyed.", status: :see_other }
       format.json { head :no_content }
+    end
+  end
+  
+  # AJAX endpoint to get filtered products based on contract type
+  def products_for_type
+    contractable_type = params[:contractable_type]
+    
+    if contractable_type == 'Cooperative'
+      # Group products for cooperatives
+      @products = InsuranceProduct.where(product_type: 'Group').order(:name)
+    elsif contractable_type == 'Individual'
+      # Individual products for individuals
+      @products = InsuranceProduct.where(product_type: 'Individual').order(:name)
+    else
+      @products = InsuranceProduct.none
+    end
+    
+    respond_to do |format|
+      format.json { render json: @products.map { |p| { id: p.id, name: p.name, product_type: p.product_type } } }
     end
   end
 
