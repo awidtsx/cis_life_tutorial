@@ -1,48 +1,133 @@
-<h1>New rate</h1>
+<div class="container mt-4">
+  <div class="mb-3">
+    <% if @agreement_rate.contract_id %>
+      <%= link_to "← Back to contract", agreement_contract_path(@agreement_rate.contract_id), class: "text-decoration-none" %>
+    <% else %>
+      <%= link_to "← Back to rates", agreement_rates_path, class: "text-decoration-none" %>
+    <% end %>
+  </div>
 
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">New Rate</h2>
+      <% if @selected_contract %>
+        <small class="text-white-50">For Contract #<%= @selected_contract.id %> - <%= @selected_contract.contractable_name %></small>
+      <% end %>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @agreement_rate, local: true) do |f| %>
+        <% if @agreement_rate.errors.any? %>
+          <div class="alert alert-danger" role="alert">
+            <h4><%= pluralize(@agreement_rate.errors.count, "error") %> prohibited this rate from being saved:</h4>
+            <ul class="mb-0">
+              <% @agreement_rate.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
 
-<%= form_with(model: @agreement_rate, local: true) do |f| %>
+        <% if @selected_contract %>
+          <!-- Show contract info as readonly -->
+          <div class="card mb-4" style="border: 2px solid #F9CB25;">
+            <div class="card-body">
+              <h5 style="color: #002C88;">Contract Information</h5>
+              <p class="mb-2">
+                <strong>Contract #<%= @selected_contract.id %></strong><br>
+                <strong>Contractable:</strong> <%= @selected_contract.contractable_name %><br>
+                <strong>Product:</strong> <%= @selected_contract.insurance_product&.name %>
+              </p>
+            </div>
+          </div>
+          <%= f.hidden_field :contract_id, value: @agreement_rate.contract_id %>
+        <% else %>
+          <!-- Show contract selector -->
+          <div class="field mb-3">
+            <%= f.label :contract_id, "Contract", class: "form-label fw-bold" %>   
+            <%= f.select :contract_id,
+                  grouped_options_for_select(
+                    @agreement_contracts.group_by { |c| c.contractable_type }.map do |type, contracts|
+                      [
+                        type,
+                        contracts.map { |c| ["Contract ##{c.id} - #{c.contractable_name} (#{c.insurance_product&.name})", c.id] }
+                      ]
+                    end,
+                    @agreement_rate.contract_id
+                  ),
+                  { prompt: "Select a contract" },
+                  { id: "contract_select", class: "form-select", required: true } %>
+            <small class="form-text text-muted">Select the agreement contract for this rate</small>
+          </div>
+        <% end %>
 
-<div class="field">
-  <%= f.label :contract_id, "Contract" %>   
-  <%= f.select :contract_id,
-        options_from_collection_for_select(@agreement_contracts, :id, :id, @agreement_rate.contract_id),
-        { prompt: "Select a contract" },
-        { id: "contract_select", class: "tom-select" } %>
-</div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="field mb-3">
+              <%= f.label :age_from, "Age From", class: "form-label fw-bold" %>
+              <%= f.number_field :age_from, class: "form-control", step: 1, min: 0, required: true, placeholder: "e.g., 18" %>
+              <small class="form-text text-muted">Starting age for this rate bracket</small>
+            </div>
 
-<div class="field">
-  <%= f.label :age_from, "Age from" %>
-  <%= f.number_field :age_from, class: "form-control", step: 1, min: 0 %>
-</div>
+            <div class="field mb-3">
+              <%= f.label :age_to, "Age To", class: "form-label fw-bold" %>
+              <%= f.number_field :age_to, class: "form-control", step: 1, min: 0, required: true, placeholder: "e.g., 30" %>
+              <small class="form-text text-muted">Ending age for this rate bracket</small>
+            </div>
 
-<div class="field">
-  <%= f.label :age_to, "Age to" %>
-  <%= f.number_field :age_to, class: "form-control", step: 1, min: 0 %>
-</div>
+            <div class="field mb-3">
+              <%= f.label :rate, "Rate (%)", class: "form-label fw-bold" %>
+              <%= f.number_field :rate, class: "form-control", step: 0.01, min: 0, required: true, placeholder: "e.g., 2.5" %>
+              <small class="form-text text-muted">Insurance rate percentage</small>
+            </div>
+          </div>
 
-<div class="field">
-  <%= f.label :rate, "Rate" %>
-  <%= f.number_field :rate, class: "form-control", step: 0.01, min: 0 %>
-</div>
+          <div class="col-md-6">
+            <div class="field mb-3">
+              <%= f.label :min_amount, "Minimum Amount", class: "form-label fw-bold" %>
+              <%= f.number_field :min_amount, class: "form-control", step: 0.01, min: 0, required: true, placeholder: "e.g., 10000" %>
+              <small class="form-text text-muted">Minimum coverage amount for this rate</small>
+            </div>
 
-<div class="field">
-  <%= f.label :min_amount, "Minimum amount" %>
-  <%= f.number_field :min_amount, class: "form-control", step: 0.01, min: 0 %>
-</div>
+            <div class="field mb-3">
+              <%= f.label :max_amount, "Maximum Amount", class: "form-label fw-bold" %>
+              <%= f.number_field :max_amount, class: "form-control", step: 0.01, min: 0, required: true, placeholder: "e.g., 100000" %>
+              <small class="form-text text-muted">Maximum coverage amount for this rate</small>
+            </div>
+          </div>
+        </div>
 
-<div class="field">
-  <%= f.label :max_amount, "Maximum amount" %>
-  <%= f.number_field :max_amount, class: "form-control", step: 0.01, min: 0 %>
-</div>
+        <div class="alert alert-info mt-3">
+          <strong>Note:</strong> Rates are used to calculate premiums based on age and coverage amount. Make sure the age ranges and amount limits don't overlap with existing rates for this contract.
+        </div>
 
-  <%= f.submit class: "btn btn-primary" %>
+        <div class="mt-4">
+          <%= f.submit "Create Rate", class: "btn btn-primary" %>
+          <% if @agreement_rate.contract_id %>
+            <%= link_to "Cancel", agreement_contract_path(@agreement_rate.contract_id), class: "btn btn-tertiary" %>
+          <% else %>
+            <%= link_to "Cancel", agreement_rates_path, class: "btn btn-tertiary" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 
-<% end %>
-
-
-<br>
-
-<div>
-  <%= link_to "Back to rates", agreement_rates_path %>
+  <!-- Help Card -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-primary">About Agreement Rates</h5>
+          <p class="card-text text-muted">
+            Agreement rates define the insurance premium calculation based on age groups and coverage amounts. 
+            Each rate applies to a specific age range and amount range, allowing for flexible pricing based on risk factors.
+          </p>
+          <p class="card-text text-muted mb-0">
+            <strong>Example:</strong> A rate of 2.5% for ages 18-30 with coverage between ₱10,000-₱100,000 means 
+            that a 25-year-old with ₱50,000 coverage would have their premium calculated using this 2.5% rate.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

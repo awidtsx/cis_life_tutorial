@@ -1,6 +1,6 @@
 class InsuranceProduct < ApplicationRecord
       enum product_type: {
-    individual: "Individual",
-    group_policy: "Group"
+    individual: "individual",
+    group_policy: "group_policy"
   }
 end

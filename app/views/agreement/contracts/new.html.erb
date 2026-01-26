@@ -8,82 +8,82 @@
       <h2 class="mb-0">New Contract</h2>
     </div>
     <div class="card-body">
-      <%= form_with(model: @agreement_contract, local: true, html: { id: 'contract_form' }) do |f| %>
-        <% if @agreement_contract.errors.any? %>
-          <div class="alert alert-danger" role="alert">
-            <h4><%= pluralize(@agreement_contract.errors.count, "error") %> prohibited this contract from being saved:</h4>
-            <ul class="mb-0">
-              <% @agreement_contract.errors.each do |error| %>
-                <li><%= error.full_message %></li>
-              <% end %>
-            </ul>
-          </div>
+<%= form_with(model: @agreement_contract, local: true, html: { id: 'contract_form' }) do |f| %>
+  <% if @agreement_contract.errors.any? %>
+    <div class="alert alert-danger" role="alert">
+      <h4><%= pluralize(@agreement_contract.errors.count, "error") %> prohibited this contract from being saved:</h4>
+      <ul class="mb-0">
+        <% @agreement_contract.errors.each do |error| %>
+          <li><%= error.full_message %></li>
         <% end %>
+      </ul>
+    </div>
+  <% end %>
 
-        <div class="row">
-          <div class="col-md-6">
-            <div class="field mb-3">
-              <%= f.label :contractable_type, "Contract Type", class: "form-label fw-bold" %>
-              <%= f.select :contractable_type,
-                    options_for_select([
-                      ["Cooperative (Group)", "Cooperative"],
-                      ["Individual", "Individual"]
-                    ], @agreement_contract.contractable_type),
-                    { prompt: "Select contract type" },
-                    { class: "tom-select", id: "contractable_type_select", required: true } %>
-              <small class="form-text text-muted">Choose whether this contract is for a cooperative (group) or individual</small>
-            </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="field mb-3">
+        <%= f.label :contractable_type, "Contract Type", class: "form-label fw-bold" %>
+        <%= f.select :contractable_type,
+              options_for_select([
+                ["Cooperative (Group)", "Cooperative"],
+                ["Individual", "Individual"]
+              ], @agreement_contract.contractable_type),
+              { prompt: "Select contract type" },
+              { class: "form-select", id: "contractable_type_select", required: true } %>
+        <small class="form-text text-muted">Choose whether this contract is for a cooperative (group) or individual</small>
+      </div>
 
-            <div class="field mb-3" id="cooperative_field" style="display: none;">
-              <%= f.label :contractable_id, "Cooperative", class: "form-label fw-bold" %>
-              <%= f.select :contractable_id,
-                    options_from_collection_for_select(@cooperatives, :id, :name, @agreement_contract.contractable_id),
-                    { prompt: "Select a cooperative" },
-                    { class: "tom-select", id: "cooperative_select" } %>
-              <small class="form-text text-muted">Choose the cooperative for this contract</small>
-            </div>
+      <div class="field mb-3" id="cooperative_field" style="display: none;">
+        <%= f.label :contractable_id, "Cooperative", class: "form-label fw-bold" %>
+        <%= f.select :contractable_id,
+              options_from_collection_for_select(@cooperatives, :id, :name, @agreement_contract.contractable_id),
+              { prompt: "Select a cooperative" },
+              { class: "form-select", id: "cooperative_select" } %>
+        <small class="form-text text-muted">Choose the cooperative for this contract</small>
+      </div>
 
-            <div class="field mb-3" id="individual_field" style="display: none;">
-              <%= f.label :contractable_id, "Individual", class: "form-label fw-bold" %>
-              <%= f.select :contractable_id,
-                    options_from_collection_for_select(@individuals, :id, :full_name, @agreement_contract.contractable_id),
-                    { prompt: "Select an individual" },
-                    { class: "tom-select", id: "individual_select" } %>
-              <small class="form-text text-muted">Choose the individual for this contract</small>
-            </div>
-          </div>
+      <div class="field mb-3" id="individual_field" style="display: none;">
+        <%= f.label :contractable_id, "Individual", class: "form-label fw-bold" %>
+        <%= f.select :contractable_id,
+              options_from_collection_for_select(@individuals, :id, :full_name, @agreement_contract.contractable_id),
+              { prompt: "Select an individual" },
+              { class: "form-select", id: "individual_select" } %>
+        <small class="form-text text-muted">Choose the individual for this contract</small>
+      </div>
+    </div>
 
-          <div class="col-md-6">
-            <div class="field mb-3">
-              <%= f.label :insurance_product_id, "Insurance Product", class: "form-label fw-bold" %>
-              <%= f.select :insurance_product_id,
-                    [],
-                    { prompt: "First select contract type" },
-                    { class: "tom-select", id: "product_select", required: true, 
-                      data: { products: @products.map { |p| { id: p.id, name: p.name, product_type: p.product_type } }.to_json } } %>
-              <small class="form-text text-muted" id="product_help">Select the insurance product for this contract</small>
-              <div id="product_type_warning" class="alert alert-warning mt-2" style="display: none;">
-                <strong>Note:</strong> <span id="warning_message"></span>
-              </div>
-            </div>
-          </div>
+    <div class="col-md-6">
+      <div class="field mb-3">
+        <%= f.label :insurance_product_id, "Insurance Product", class: "form-label fw-bold" %>
+        <%= f.select :insurance_product_id,
+              [],
+              { prompt: "First select contract type" },
+              { class: "form-select", id: "product_select", required: true, 
+                data: { products: @products.map { |p| { id: p.id, name: p.name, product_type: p.product_type } }.to_json } } %>
+        <small class="form-text text-muted" id="product_help">Select the insurance product for this contract</small>
+        <div id="product_type_warning" class="alert alert-warning mt-2" style="display: none;">
+          <strong>Note:</strong> <span id="warning_message"></span>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="alert alert-info mt-3">
-          <strong>Important:</strong> 
-          <ul class="mb-0">
-            <li>First select the <strong>Contract Type</strong></li>
-            <li>For <strong>Cooperative</strong> contracts, only <strong>Group</strong> insurance products will be available</li>
-            <li>For <strong>Individual</strong> contracts, only <strong>Individual</strong> insurance products will be available</li>
-            <li>Then select the specific cooperative or individual</li>
-          </ul>
-        </div>
+  <div class="alert alert-info mt-3">
+    <strong>Important:</strong> 
+    <ul class="mb-0">
+      <li>First select the <strong>Contract Type</strong></li>
+      <li>For <strong>Cooperative</strong> contracts, only <strong>Group</strong> insurance products will be available</li>
+      <li>For <strong>Individual</strong> contracts, only <strong>Individual</strong> insurance products will be available</li>
+      <li>Then select the specific cooperative or individual</li>
+    </ul>
+  </div>
 
-        <div class="mt-4">
-          <%= f.submit "Create Contract", class: "btn btn-primary", id: "submit_button" %>
-          <%= link_to "Cancel", agreement_contracts_path, class: "btn btn-tertiary" %>
-        </div>
-      <% end %>
+  <div class="mt-4">
+    <%= f.submit "Create Contract", class: "btn btn-primary", id: "submit_button" %>
+    <%= link_to "Cancel", agreement_contracts_path, class: "btn btn-tertiary" %>
+  </div>
+<% end %>
     </div>
   </div>
 

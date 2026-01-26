@@ -12,9 +12,15 @@ class Agreement::RatesController < ApplicationController
   end
 
   # GET /agreement/rates/new
-  def new
-    @agreement_rate = Agreement::Rate.new
+ def new
+  @agreement_rate = Agreement::Rate.new
+  
+  # Pre-populate contract_id if provided
+  if params[:contract_id]
+    @agreement_rate.contract_id = params[:contract_id]
+    @selected_contract = Agreement::Contract.find_by(id: params[:contract_id])
   end
+end
 
   # GET /agreement/rates/1/edit
   def edit
@@ -24,14 +30,20 @@ class Agreement::RatesController < ApplicationController
   def create
     @agreement_rate = Agreement::Rate.new(agreement_rate_params)
 
-    respond_to do |format|
-      if @agreement_rate.save
-        format.html { redirect_to @agreement_rate, notice: "Rate was successfully created." }
-        format.json { render :show, status: :created, location: @agreement_rate }
+  respond_to do |format|
+    if @agreement_rate.save
+      # Redirect back to the contract if contract_id is present
+      if @agreement_rate.contract_id
+        format.html { redirect_to agreement_contract_path(@agreement_rate.contract_id), notice: "Rate was successfully created." }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @agreement_rate.errors, status: :unprocessable_entity }
+        format.html { redirect_to @agreement_rate, notice: "Rate was successfully created." }
       end
+      format.json { render :show, status: :created, location: @agreement_rate }
+    else
+      load_rate
+      format.html { render :new, status: :unprocessable_entity }
+      format.json { render json: @agreement_rate.errors, status: :unprocessable_entity }
+    end
     end
   end
 

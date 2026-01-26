@@ -135,38 +135,8 @@ function initContractTypeToggle() {
   typeSelect.addEventListener('change', toggleFields)
   toggleFields() // Initialize on page load
 }
-
-// Agreement Type Toggle for Polymorphic Agreement (Insurance Contracts)
-document.addEventListener("turbo:load", initAgreementTypeToggle)
-document.addEventListener("DOMContentLoaded", initAgreementTypeToggle)
-
-function initAgreementTypeToggle() {
-  const agreementTypeSelect = document.getElementById('agreement_type_select')
-  const rateField = document.getElementById('rate_field')
-  const contractField = document.getElementById('contract_field')
-  
-  if (!agreementTypeSelect || !rateField || !contractField) return
-  
-  function toggleAgreementFields() {
-    const selectedType = agreementTypeSelect.value
-    
-    if (selectedType === 'Agreement::Rate') {
-      rateField.style.display = 'block'
-      contractField.style.display = 'none'
-    } else if (selectedType === 'Agreement::Contract') {
-      rateField.style.display = 'none'
-      contractField.style.display = 'block'
-    } else {
-      rateField.style.display = 'none'
-      contractField.style.display = 'none'
-    }
-  }
-  
-  agreementTypeSelect.addEventListener('change', toggleAgreementFields)
-  toggleAgreementFields() // Initialize on page load
-}
-
-// Agreement Contract Type Toggle and Product Filtering
+// Agreement Contract Type Toggle and Product Filtering (No TomSelect)
+// Agreement Contract Type Toggle and Product Filtering (No TomSelect)
 document.addEventListener("turbo:load", initAgreementContractForm)
 document.addEventListener("DOMContentLoaded", initAgreementContractForm)
 
@@ -194,30 +164,28 @@ function initAgreementContractForm() {
   console.log('All products:', allProducts)
   console.log('Current product ID:', currentProductId)
   
-  // Initialize TomSelect instances
-  let typeTomSelect = null
-  let cooperativeTomSelect = null
-  let individualTomSelect = null
-  let productTomSelect = null
+  // Add change listener to contract type
+  typeSelect.addEventListener('change', function() {
+    toggleFieldsAndUpdateProducts(this.value)
+  })
   
-  // Wait for TomSelect to be initialized
-  setTimeout(() => {
-    typeTomSelect = typeSelect.tomselect
-    cooperativeTomSelect = cooperativeSelect?.tomselect
-    individualTomSelect = individualSelect?.tomselect
-    productTomSelect = productSelect.tomselect
-    
-    if (typeTomSelect) {
-      typeTomSelect.on('change', function(value) {
-        toggleFieldsAndUpdateProducts(value)
-      })
-    }
-    
-    // Initialize on page load
-    if (typeSelect.value) {
-      toggleFieldsAndUpdateProducts(typeSelect.value)
-    }
-  }, 100)
+  // Add change listeners for validation
+  if (cooperativeSelect) {
+    cooperativeSelect.addEventListener('change', validateForm)
+  }
+  
+  if (individualSelect) {
+    individualSelect.addEventListener('change', validateForm)
+  }
+  
+  if (productSelect) {
+    productSelect.addEventListener('change', validateForm)
+  }
+  
+  // Initialize on page load
+  if (typeSelect.value) {
+    toggleFieldsAndUpdateProducts(typeSelect.value)
+  }
   
   function toggleFieldsAndUpdateProducts(selectedType) {
     console.log('Selected type:', selectedType)
@@ -226,32 +194,32 @@ function initAgreementContractForm() {
       cooperativeField.style.display = 'block'
       individualField.style.display = 'none'
       
-      if (cooperativeTomSelect) cooperativeTomSelect.enable()
-      if (individualTomSelect) {
-        individualTomSelect.disable()
-        individualTomSelect.clear()
+      if (cooperativeSelect) cooperativeSelect.disabled = false
+      if (individualSelect) {
+        individualSelect.disabled = true
+        individualSelect.value = ''
       }
       
-      updateProductOptions('Group')
+      updateProductOptions('group_policy')
       
     } else if (selectedType === 'Individual') {
       cooperativeField.style.display = 'none'
       individualField.style.display = 'block'
       
-      if (individualTomSelect) individualTomSelect.enable()
-      if (cooperativeTomSelect) {
-        cooperativeTomSelect.disable()
-        cooperativeTomSelect.clear()
+      if (individualSelect) individualSelect.disabled = false
+      if (cooperativeSelect) {
+        cooperativeSelect.disabled = true
+        cooperativeSelect.value = ''
       }
       
-      updateProductOptions('Individual')
+      updateProductOptions('individual')
       
     } else {
       cooperativeField.style.display = 'none'
       individualField.style.display = 'none'
       
-      if (cooperativeTomSelect) cooperativeTomSelect.disable()
-      if (individualTomSelect) individualTomSelect.disable()
+      if (cooperativeSelect) cooperativeSelect.disabled = true
+      if (individualSelect) individualSelect.disabled = true
       
       clearProductOptions()
     }
@@ -261,29 +229,36 @@ function initAgreementContractForm() {
   
   function updateProductOptions(productType) {
     console.log('Updating products for type:', productType)
-    
-    if (!productTomSelect) return
+    console.log('All available products:', allProducts)
     
     // Save current selection
-    const currentValue = productTomSelect.getValue()
+    const currentValue = productSelect.value
     
     // Clear all options
-    productTomSelect.clearOptions()
-    productTomSelect.clear()
+    productSelect.innerHTML = ''
     
-    // Filter products by type
-    const filteredProducts = allProducts.filter(p => p.product_type === productType)
+    // Add prompt option
+    const promptOption = document.createElement('option')
+    promptOption.value = ''
+    promptOption.textContent = 'Select a product'
+    productSelect.appendChild(promptOption)
+    
+    // Filter products by type - match exactly what's in the database
+    const filteredProducts = allProducts.filter(p => {
+      console.log('Checking product:', p.name, 'with type:', p.product_type, 'against:', productType)
+      return p.product_type === productType
+    })
     console.log('Filtered products:', filteredProducts)
     
     if (filteredProducts.length === 0) {
-      productTomSelect.addOption({
-        value: '',
-        text: 'No ' + productType + ' products available'
-      })
-      productTomSelect.disable()
+      const noProductOption = document.createElement('option')
+      noProductOption.value = ''
+      noProductOption.textContent = 'No ' + (productType === 'group_policy' ? 'Group' : 'Individual') + ' products available'
+      productSelect.appendChild(noProductOption)
+      productSelect.disabled = true
       
       if (productHelp) {
-        productHelp.textContent = 'No ' + productType + ' products found. Please create one first.'
+        productHelp.textContent = 'No ' + (productType === 'group_policy' ? 'Group' : 'Individual') + ' products found. Please create one first.'
         productHelp.classList.add('text-danger')
         productHelp.classList.remove('text-success')
       }
@@ -293,43 +268,42 @@ function initAgreementContractForm() {
     } else {
       // Add filtered products
       filteredProducts.forEach(product => {
-        productTomSelect.addOption({
-          value: product.id,
-          text: product.name
-        })
+        const option = document.createElement('option')
+        option.value = product.id
+        option.textContent = product.name
+        productSelect.appendChild(option)
       })
       
-      productTomSelect.enable()
+      productSelect.disabled = false
       
       // Restore selection if it's still valid
       if (currentValue && filteredProducts.some(p => p.id == currentValue)) {
-        productTomSelect.setValue(currentValue, true)
+        productSelect.value = currentValue
       } else if (currentProductId && filteredProducts.some(p => p.id == currentProductId)) {
-        productTomSelect.setValue(currentProductId, true)
+        productSelect.value = currentProductId
       }
       
       if (productHelp) {
-        productHelp.textContent = 'Only ' + productType + ' products are shown'
+        productHelp.textContent = 'Only ' + (productType === 'group_policy' ? 'Group' : 'Individual') + ' products are shown'
         productHelp.classList.remove('text-danger')
         productHelp.classList.add('text-success')
       }
       
       if (submitButton) submitButton.disabled = false
     }
-    
-    productTomSelect.refreshOptions(false)
   }
   
   function clearProductOptions() {
-    if (!productTomSelect) return
+    // Clear all options
+    productSelect.innerHTML = ''
     
-    productTomSelect.clearOptions()
-    productTomSelect.clear()
-    productTomSelect.addOption({
-      value: '',
-      text: 'First select contract type'
-    })
-    productTomSelect.disable()
+    // Add prompt option
+    const promptOption = document.createElement('option')
+    promptOption.value = ''
+    promptOption.textContent = 'First select contract type'
+    productSelect.appendChild(promptOption)
+    
+    productSelect.disabled = true
     
     if (productHelp) {
       productHelp.textContent = 'Select the insurance product for this contract'
@@ -338,12 +312,10 @@ function initAgreementContractForm() {
   }
   
   function validateForm() {
-    if (!typeTomSelect || !productTomSelect) return
-    
-    const selectedType = typeTomSelect.getValue()
-    const selectedCooperative = cooperativeTomSelect?.getValue()
-    const selectedIndividual = individualTomSelect?.getValue()
-    const selectedProduct = productTomSelect.getValue()
+    const selectedType = typeSelect.value
+    const selectedCooperative = cooperativeSelect?.value
+    const selectedIndividual = individualSelect?.value
+    const selectedProduct = productSelect.value
     
     let isValid = true
     let message = ''
@@ -374,18 +346,5 @@ function initAgreementContractForm() {
     }
     
     return isValid
-  }
-  
-  // Add change listeners for validation
-  if (cooperativeTomSelect) {
-    cooperativeTomSelect.on('change', validateForm)
-  }
-  
-  if (individualTomSelect) {
-    individualTomSelect.on('change', validateForm)
-  }
-  
-  if (productTomSelect) {
-    productTomSelect.on('change', validateForm)
   }
 }

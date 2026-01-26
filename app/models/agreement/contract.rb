@@ -28,11 +28,11 @@ class Agreement::Contract < ApplicationRecord
 
     case contractable_type
     when 'Cooperative'
-      unless insurance_product.product_type == 'Group'
+      unless insurance_product.product_type == 'group_policy'
         errors.add(:insurance_product_id, 'must be a Group product for Cooperative contracts')
       end
     when 'Individual'
-      unless insurance_product.product_type == 'Individual'
+      unless insurance_product.product_type == 'individual'
         errors.add(:insurance_product_id, 'must be an Individual product for Individual contracts')
       end
     end

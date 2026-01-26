@@ -102,4 +102,51 @@
       </div>
     </div>
   </div>
+
+<div class="card mb-4">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0">Agreement Rates</h5>
+  </div>
+  <div class="card-body">
+    <p class="mb-3">Manage rates for this contract based on age groups and coverage amounts.</p>
+    <%= link_to "Add New Rate", new_agreement_rate_path(contract_id: @agreement_contract.id), class: "btn btn-primary" %>
+    
+    <% if @agreement_contract.agreement_rates.any? %>
+      <div class="table-responsive mt-4">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Age Range</th>
+              <th>Rate (%)</th>
+              <th>Min Amount</th>
+              <th>Max Amount</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @agreement_contract.agreement_rates.each do |rate| %>
+              <tr>
+                <td><%= rate.age_from %> - <%= rate.age_to %></td>
+                <td><%= number_with_precision(rate.rate, precision: 2) %>%</td>
+                <td><%= number_to_currency(rate.min_amount) %></td>
+                <td><%= number_to_currency(rate.max_amount) %></td>
+                <td class="text-end">
+                  <%= link_to "View", agreement_rate_path(rate), class: "btn btn-sm btn-outline-primary" %>
+                  <%= link_to "Edit", edit_agreement_rate_path(rate), class: "btn btn-sm btn-outline-secondary" %>
+                  <%= button_to "Delete", agreement_rate_path(rate), method: :delete,
+                      data: { confirm: "Are you sure?" },
+                      class: "btn btn-sm btn-outline-danger" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="alert alert-info mt-3">
+        No rates defined for this contract yet.
+      </div>
+    <% end %>
+  </div>
+</div>
 </div>
