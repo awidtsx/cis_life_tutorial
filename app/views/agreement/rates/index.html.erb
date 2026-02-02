@@ -1,14 +1,148 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Rates</h1>
-
-<div id="agreement_rates">
-  <% @agreement_rates.each do |agreement_rate| %>
-    <%= render agreement_rate %>
-    <p>
-      <%= link_to "Show this rate", agreement_rate %>
-    </p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
-</div>
 
-<%= link_to "New rate", new_agreement_rate_path %>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold" style="color: #002C88;">Agreement Rates</h1>
+    <%= link_to "New Rate", new_agreement_rate_path, class: "btn text-white", style: "background-color: #002C88;" %>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @agreement_rates.empty? %>
+        <div class="text-center py-5">
+          <p class="text-muted mb-3">No agreement rates found</p>
+          <%= link_to "Create your first rate", new_agreement_rate_path, class: "btn text-white", style: "background-color: #002C88;" %>
+        </div>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead style="background-color: #002C88; color: #FDFDFD;">
+              <tr>
+                <th>Rate ID</th>
+                <th>Contract ID</th>
+                <th>Contractable</th>
+                <th>Product</th>
+                <th>Age Range</th>
+                <th>Rate (%)</th>
+                <th>Min Amount</th>
+                <th>Max Amount</th>
+                <th>Created At</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @agreement_rates.each do |agreement_rate| %>
+                <tr>
+                  <td><strong>#<%= agreement_rate.id %></strong></td>
+                  <td>
+                    <% if agreement_rate.contract %>
+                      <%= link_to "##{agreement_rate.contract.id}", agreement_contract_path(agreement_rate.contract), style: "color: #002C88; text-decoration: none;" %>
+                    <% else %>
+                      <span class="text-muted">N/A</span>
+                    <% end %>
+                  </td>
+                  <td>
+                    <% if agreement_rate.contract %>
+                      <strong><%= agreement_rate.contract.contractable_name %></strong><br>
+                      <small class="text-muted">
+                        <span class="badge" style="background-color: <%= agreement_rate.contract.contractable_type == 'Cooperative' ? '#F9CB25' : '#CCCCCC' %>; color: #031249;">
+                          <%= agreement_rate.contract.contractable_type %>
+                        </span>
+                      </small>
+                    <% else %>
+                      <span class="text-muted">N/A</span>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= agreement_rate.contract&.insurance_product&.name || 'N/A' %>
+                  </td>
+                  <td>
+                    <span class="badge" style="background-color: #002C88; color: #FDFDFD;">
+                      <%= agreement_rate.age_from %> - <%= agreement_rate.age_to %>
+                    </span>
+                  </td>
+                  <td>
+                    <strong style="color: #002C88;"><%= number_with_precision(agreement_rate.rate, precision: 2) %>%</strong>
+                  </td>
+                  <td><%= number_to_currency(agreement_rate.min_amount, precision: 0) %></td>
+                  <td><%= number_to_currency(agreement_rate.max_amount, precision: 0) %></td>
+                  <td><%= agreement_rate.created_at.strftime("%B %d, %Y") %></td>
+                  <td class="text-end">
+                    <%= link_to "View", agreement_rate, class: "btn btn-sm", style: "background-color: #002C88; color: #FDFDFD;" %>
+                    <%= link_to "Edit", edit_agreement_rate_path(agreement_rate), class: "btn btn-sm", style: "background-color: #CCCCCC; color: #031249;" %>
+                    <%= button_to "Delete", agreement_rate, method: :delete, 
+                        data: { confirm: "Are you sure you want to delete this rate?" }, 
+                        class: "btn btn-sm text-white", style: "background-color: #A80F21;" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #002C88;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Rates</h6>
+          <h3 class="fw-bold mb-0"><%= @agreement_rates.count %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Unique Contracts</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @agreement_rates.pluck(:contract_id).compact.uniq.count %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #F9CB25; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Average Rate</h6>
+          <h3 class="fw-bold mb-0">
+            <% avg_rate = @agreement_rates.count > 0 ? @agreement_rates.average(:rate).to_f.round(2) : 0 %>
+            <%= number_with_precision(avg_rate, precision: 2) %>%
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #CCCCCC; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Age Brackets</h6>
+          <h3 class="fw-bold mb-0">
+            <%= @agreement_rates.count %>
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Section -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title" style="color: #002C88;">About Agreement Rates</h5>
+          <p class="card-text text-muted">
+            Agreement rates define insurance premium calculations based on age groups and coverage amounts. 
+            Each rate applies to a specific age range and amount range, allowing flexible pricing based on risk factors.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

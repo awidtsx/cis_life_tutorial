@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Registries</h1>
+
+<div id="registries">
+  <% @registries.each do |registry| %>
+    <%= render registry %>
+    <p>
+      <%= link_to "Show this registry", registry %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New registry", new_registry_path %>

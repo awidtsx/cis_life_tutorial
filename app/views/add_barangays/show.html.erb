@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @add_barangay %>
+
+<div>
+  <%= link_to "Edit this add barangay", edit_add_barangay_path(@add_barangay) %> |
+  <%= link_to "Back to add barangays", add_barangays_path %>
+
+  <%= button_to "Destroy this add barangay", @add_barangay, method: :delete %>
+</div>

@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<%= link_to "New add municipal", new_add_municipal_path %>
+<h1>Add municipals</h1>
+
+<div id="add_municipals">
+  <% @add_municipals.each do |add_municipal| %>
+    <%= render add_municipal %>
+    <p>
+      <%= link_to "Show this add municipal", add_municipal %>
+    </p>
+  <% end %>
+</div>
+

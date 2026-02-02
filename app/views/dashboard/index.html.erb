@@ -10,27 +10,27 @@
       <div class="row align-items-start">
         <!-- LEFT: USER DETAILS -->
         <div class="col-md-8">
-          <h5 class="fw-bold mb-3">JOHN DOE</h5>
+          <h5 class="fw-bold mb-3"><%= @user.first_name %> <%= @user.last_name %></h5>
 
           <div class="row mb-2">
             <div class="col-md-6">
               <small class="text-muted">Username</small>
-              <div>—</div>
+              <div><%= @user.email %></div>
             </div>
             <div class="col-md-6">
               <small class="text-muted">Email</small>
-              <div>placeholder@email.com</div>
+              <div><%= @user.email %></div>
             </div>
           </div>
 
           <div class="row mb-2">
             <div class="col-md-6">
               <small class="text-muted">Gender</small>
-              <div>—</div>
+              <div><%= @user.gender %></div>
             </div>
             <div class="col-md-6">
-              <small class="text-muted">Birth Date</small>
-              <div>—</div>
+              <small class="text-muted">Birthday</small>
+              <div><%= @user.birthdate.strftime("%B %d, %Y") %></div>
             </div>
           </div>
         </div>
@@ -43,12 +43,12 @@
 
               <div class="mb-2">
                 <small class="text-muted">Organization Type</small>
-                <div>—</div>
+                <div><%= @user.cooperative&.name %></div>
               </div>
 
               <div>
                 <small class="text-muted">Last Sign In</small>
-                <div>—</div>
+                <div><%= @user.updated_at.strftime("%B %d, %Y") %></div>
               </div>
             </div>
           </div>
@@ -60,18 +60,18 @@
   <!-- STATS CARDS -->
   <div class="row mb-4">
     <% stats = [
-      ["Sign In Count", "#002C88"],
-      ["Account Age", "#031249"],
-      ["Role Level", "#002C88"],
-      ["Status", "#031249"]
+      ["Sign In Count", "#002C88", @user.sign_in_count],
+      ["Account Age", "#031249", ((Time.current - @user.created_at) / 1.day).to_i],
+      ["Role Level", "#002C88", @user.role&.name || "N/A"],
+      ["Status", "#031249", @user.active? ? "Active" : "Inactive"]
     ] %>
 
-    <% stats.each do |title, color| %>
+    <% stats.each do |title, color, text| %>
       <div class="col-md-3">
         <div class="card text-white mb-3" style="background-color:<%= color %>;">
           <div class="card-body">
             <h6 class="text-uppercase small"><%= title %></h6>
-            <h3 class="fw-bold mb-0">—</h3>
+            <h3 class="fw-bold mb-0"><%= text %></h3>
           </div>
         </div>
       </div>
@@ -86,19 +86,19 @@
 
       <div class="row text-center mb-3">
         <div class="col-md-3">
-          <h3 style="color:#002C88;">15</h3>
+          <h3 style="color:#002C88;"><%= @certificate_overview.total_certificates %></h3>
           <small>Total Certificates</small>
         </div>
         <div class="col-md-3">
-          <h3 style="color:#031249;">7</h3>
+          <h3 style="color:#031249;"><%= @certificate_overview.active_certificates %></h3>
           <small>Active</small>
         </div>
         <div class="col-md-3">
-          <h3 style="color:#002C88;">2</h3>
+          <h3 style="color:#002C88;">₱<%= @certificate_overview.total_sum_assured %></h3>
           <small>Total Sum Assured</small>
         </div>
         <div class="col-md-3">
-          <h3 style="color:#031249;">4</h3>
+          <h3 style="color:#031249;">₱<%= @certificate_overview.total_premium %></h3>
           <small>Total Premium</small>
         </div>
       </div>
@@ -118,32 +118,32 @@
       <%= render "dashboard/system_module_card",
           title: "Insurance",
           color: "#002C88",
-          items: ["Certificates", "Group Contracts", "Perils", "Products"] %>
+          items: [{label: "Certificates", path: insurance_contracts_path}, {label: "Group Contracts", path: insurance_groups_path}, {label: "Perils", path: insurance_contracts_path}, {label: "Products", path: insurance_products_path}] %>
 
       <%= render "dashboard/system_module_card",
           title: "Agreement",
           color: "#031249",
-          items: ["Contracts", "Coverages", "Eligibilities", "Relationships", "Rates"] %>
+          items: [{label: "Contracts", path: agreement_contracts_path}, {label: "Coverages", path: agreement_contracts_path}, {label: "Eligibilities", path: agreement_rates_path}, {label: "Relationships", path: agreement_contracts_path}, {label: "Rates", path: agreement_rates_path}] %>
 
       <%= render "dashboard/system_module_card",
           title: "User Management",
           color: "#002C88",
-          items: ["Producers", "Permissions", "Roles", "Resources"] %>
+          items: [{label: "Producers", path: producers_path}, {label: "Permissions", path: insurance_contracts_path}, {label: "Roles", path: roles_path}, {label: "Resources", path: insurance_contracts_path}] %>
 
       <%= render "dashboard/system_module_card",
           title: "Address",
           color: "#031249",
-          items: ["Regions", "Provinces", "Municipalities", "Barangays"] %>
+          items: [{ label: "Regions", path: add_regions_path }, { label: "Provinces", path: add_provinces_path }, { label: "Municipals", path: add_municipals_path }, { label: "Barangays", path: add_barangays_path }] %>
 
       <%= render "dashboard/system_module_card",
           title: "Cooperative",
           color: "#002C88",
-          items: ["Registries", "Branches", "Memberships", "Employees", "Types"] %>
+          items: [{label: "Registries", path: registries_path}, {label: "Branches", path: branches_path}, {label: "Memberships", path: coop_memberships_path}, {label: "Employees", path: employees_path}, {label: "Types", path: types_path}] %>
 
       <%= render "dashboard/system_module_card",
           title: "General",
           color: "#031249",
-          items: ["Individuals", "Dependents", "Relationship Types", "Departments", "Branches", "Territories"] %>
+          items: [{label: "Individuals", path: individuals_path}, {label: "Dependents", path: insurance_contracts_path}, {label: "Relationship Types", path: insurance_contracts_path}, {label: "Departments", path: departments_path}, {label: "Branches", path: branches_path}, {label: "Territories", path: insurance_contracts_path}] %>
     </div>
   </div>
 

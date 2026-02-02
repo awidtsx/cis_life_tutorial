@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Add regions</h1>
+
+<div id="add_regions">
+  <% @add_regions.each do |add_region| %>
+    <%= render add_region %>
+    <p>
+      <%= link_to "Show this add region", add_region %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New add region", new_add_region_path %>

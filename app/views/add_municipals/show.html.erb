@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @add_municipal %>
+
+<div>
+  <%= link_to "Edit this add municipal", edit_add_municipal_path(@add_municipal) %> |
+  <%= link_to "Back to add municipals", add_municipals_path %>
+
+  <%= button_to "Destroy this add municipal", @add_municipal, method: :delete %>
+</div>

@@ -1,4 +1,15 @@
 Rails.application.routes.draw do
+  resources :producers
+  resources :departments
+  resources :roles
+  resources :types
+  resources :employees
+  resources :registries
+  resources :branches
+  resources :add_barangays
+  resources :add_provinces
+  resources :add_municipals
+  resources :add_regions
   get 'dashboard/index'
   get "/dashboard", to: "dashboard#index"
   get 'auth/index'

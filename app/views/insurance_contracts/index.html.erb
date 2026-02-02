@@ -1,14 +1,188 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Insurance contracts</h1>
-
-<div id="insurance_contracts">
-  <% @insurance_contracts.each do |insurance_contract| %>
-    <%= render insurance_contract %>
-    <p>
-      <%= link_to "Show this insurance contract", insurance_contract %>
-    </p>
+<div class="container mt-4">
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <% end %>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold" style="color: #002C88;">Insurance Contracts</h1>
+    <div class="dropdown">
+      <button class="btn text-white dropdown-toggle" type="button" data-bs-toggle="dropdown" style="background-color: #002C88;">
+        New Contract
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="<%= new_individual_insurance_contract_path('individual') %>">Individual Contract</a></li>
+        <li><a class="dropdown-item" href="<%= new_coop_membership_insurance_contract_path('coop_membership') %>">Group Member Contract</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @insurance_contracts.empty? %>
+        <div class="text-center py-5">
+          <p class="text-muted mb-3">No insurance contracts found</p>
+          <p class="text-muted small">Create contracts for individuals or cooperative members</p>
+        </div>
+      <% else %>
+        <!-- Filter Tabs -->
+        <ul class="nav nav-tabs mb-3" id="contractTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#all-contracts" type="button">
+              All Contracts <span class="badge" style="background-color: #F9CB25; color: #031249;"><%= @insurance_contracts.count %></span>
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#individual-contracts" type="button">
+              Individual <span class="badge" style="background-color: #002C88; color: #FDFDFD;"><%= @insurance_contracts.where(insured_type: 'Individual').count %></span>
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#group-contracts" type="button">
+              Group Members <span class="badge" style="background-color: #031249; color: #FDFDFD;"><%= @insurance_contracts.where(insured_type: 'CoopMembership').count %></span>
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="contractTabsContent">
+          <!-- All Contracts -->
+          <div class="tab-pane fade show active" id="all-contracts" role="tabpanel">
+            <%= render partial: 'insurance_contracts_table', locals: { contracts: @insurance_contracts } %>
+          </div>
+
+          <!-- Individual Contracts -->
+          <div class="tab-pane fade" id="individual-contracts" role="tabpanel">
+            <%= render partial: 'insurance_contracts_table', locals: { contracts: @insurance_contracts.where(insured_type: 'Individual') } %>
+          </div>
+
+          <!-- Group Contracts -->
+          <div class="tab-pane fade" id="group-contracts" role="tabpanel">
+            <%= render partial: 'insurance_contracts_table', locals: { contracts: @insurance_contracts.where(insured_type: 'CoopMembership') } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #002C88;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Contracts</h6>
+          <h3 class="fw-bold mb-0"><%= @insurance_contracts.count %></h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white" style="background-color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Coverage</h6>
+          <h3 class="fw-bold mb-0" style="font-size: 1.5rem;">
+            <%= number_to_currency(@insurance_contracts.sum(:amount_covered), precision: 0) %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #F9CB25; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Total Premiums</h6>
+          <h3 class="fw-bold mb-0" style="font-size: 1.5rem;">
+            <%= number_to_currency(@insurance_contracts.sum(:premium), precision: 0) %>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card" style="background-color: #CCCCCC; color: #031249;">
+        <div class="card-body">
+          <h6 class="text-uppercase small">Active Contracts</h6>
+          <% active_contracts = @insurance_contracts.where('expiry >= ?', Date.today).count %>
+          <h3 class="fw-bold mb-0"><%= active_contracts %></h3>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<%= link_to "New insurance contract", new_insurance_contract_path %>
+<!-- Partial for table -->
+<% if false %>
+<%= content_tag :div, id: '_insurance_contracts_table' do %>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead style="background-color: #002C88; color: #FDFDFD;">
+        <tr>
+          <th>Contract ID</th>
+          <th>Insured Type</th>
+          <th>Insured Name</th>
+          <th>Agreement</th>
+          <th>Age</th>
+          <th>Coverage</th>
+          <th>Premium</th>
+          <th>Rate</th>
+          <th>Period</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% contracts.each do |contract| %>
+          <% 
+            insured_name = if contract.insured.is_a?(Individual)
+              contract.insured.full_name
+            elsif contract.insured.is_a?(CoopMembership)
+              "#{contract.insured.cooperative&.name} - #{contract.insured.individual&.full_name}"
+            else
+              'N/A'
+            end
+            
+            is_active = contract.expiry >= Date.today
+          %>
+          <tr>
+            <td><strong>#<%= contract.id %></strong></td>
+            <td>
+              <span class="badge" style="background-color: <%= contract.insured_type == 'Individual' ? '#002C88' : '#F9CB25' %>; color: <%= contract.insured_type == 'Individual' ? '#FDFDFD' : '#031249' %>;">
+                <%= contract.insured_type %>
+              </span>
+            </td>
+            <td><%= insured_name %></td>
+            <td>
+              <span class="badge" style="background-color: <%= contract.agreement_type == 'Agreement::Rate' ? '#031249' : '#CCCCCC' %>; color: <%= contract.agreement_type == 'Agreement::Rate' ? '#FDFDFD' : '#031249' %>;">
+                <%= contract.agreement_type&.split('::')&.last || 'N/A' %>
+              </span>
+            </td>
+            <td><%= contract.age %></td>
+            <td><%= number_to_currency(contract.amount_covered, precision: 0) %></td>
+            <td><strong style="color: #002C88;"><%= number_to_currency(contract.premium, precision: 2) %></strong></td>
+            <td><%= number_with_precision(contract.rate, precision: 2) %>%</td>
+            <td>
+              <small>
+                <%= contract.effectivity&.strftime("%m/%d/%y") %> - 
+                <%= contract.expiry&.strftime("%m/%d/%y") %>
+                <br>(<%= contract.term %> mo)
+              </small>
+            </td>
+            <td>
+              <% if is_active %>
+                <span class="badge" style="background-color: #28a745; color: white;">Active</span>
+              <% else %>
+                <span class="badge" style="background-color: #dc3545; color: white;">Expired</span>
+              <% end %>
+            </td>
+            <td class="text-end">
+              <%= link_to "View", [contract.insured, contract], class: "btn btn-sm", style: "background-color: #002C88; color: #FDFDFD;" %>
+              <%= link_to "Edit", edit_individual_insurance_contract_path(contract.insured, contract), class: "btn btn-sm", style: "background-color: #CCCCCC; color: #031249;" %>
+              <%= button_to "Delete", [contract.insured, contract], method: :delete, 
+                  data: { confirm: "Are you sure?" }, 
+                  class: "btn btn-sm text-white", style: "background-color: #A80F21;" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+<% end %>

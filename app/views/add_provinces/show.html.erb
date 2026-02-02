@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @add_province %>
+
+<div>
+  <%= link_to "Edit this add province", edit_add_province_path(@add_province) %> |
+  <%= link_to "Back to add provinces", add_provinces_path %>
+
+  <%= button_to "Destroy this add province", @add_province, method: :delete %>
+</div>

@@ -1,0 +1,27 @@
+<%= form_with(model: registry) do |form| %>
+  <% if registry.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(registry.errors.count, "error") %> prohibited this registry from being saved:</h2>
+
+      <ul>
+        <% registry.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :cooperative_id, style: "display: block" %>
+    <%= form.text_field :cooperative_id %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

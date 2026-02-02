@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @add_region %>
+
+<div>
+  <%= link_to "Edit this add region", edit_add_region_path(@add_region) %> |
+  <%= link_to "Back to add regions", add_regions_path %>
+
+  <%= button_to "Destroy this add region", @add_region, method: :delete %>
+</div>

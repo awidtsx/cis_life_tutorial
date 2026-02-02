@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_21_081154) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_29_082137) do
   create_table "add_barangays", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.bigint "add_municipal_id", null: false
@@ -64,6 +64,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_21_081154) do
     t.index ["contract_id"], name: "index_agreement_rates_on_contract_id"
   end
 
+  create_table "branches", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_branches_on_cooperative_id"
+  end
+
   create_table "coop_memberships", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "cooperative_id", null: false
     t.bigint "individual_id", null: false
@@ -86,6 +94,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_21_081154) do
     t.index ["add_municipal_id"], name: "index_cooperatives_on_add_municipal_id"
     t.index ["add_province_id"], name: "index_cooperatives_on_add_province_id"
     t.index ["add_region_id"], name: "index_cooperatives_on_add_region_id"
+  end
+
+  create_table "departments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "employees", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_employees_on_cooperative_id"
   end
 
   create_table "individuals", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -135,6 +157,36 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_21_081154) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "producers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "registries", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_registries_on_cooperative_id"
+  end
+
+  create_table "roles", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "types", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.bigint "cooperative_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cooperative_id"], name: "index_types_on_cooperative_id"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -143,8 +195,27 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_21_081154) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "birthdate"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "designation"
+    t.string "gender"
+    t.bigint "branch_id"
+    t.bigint "cooperative_id"
+    t.bigint "department_id"
+    t.boolean "active"
+    t.bigint "role_id"
+    t.integer "sign_in_count", default: 0, null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
+    t.index ["branch_id"], name: "index_users_on_branch_id"
+    t.index ["cooperative_id"], name: "index_users_on_cooperative_id"
+    t.index ["department_id"], name: "index_users_on_department_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["role_id"], name: "index_users_on_role_id"
   end
 
   add_foreign_key "add_barangays", "add_municipals"
@@ -152,13 +223,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_21_081154) do
   add_foreign_key "add_provinces", "add_regions"
   add_foreign_key "agreement_contracts", "insurance_products"
   add_foreign_key "agreement_rates", "agreement_contracts", column: "contract_id"
+  add_foreign_key "branches", "cooperatives"
   add_foreign_key "coop_memberships", "cooperatives"
   add_foreign_key "coop_memberships", "individuals"
   add_foreign_key "cooperatives", "add_barangays"
   add_foreign_key "cooperatives", "add_municipals"
   add_foreign_key "cooperatives", "add_provinces"
   add_foreign_key "cooperatives", "add_regions"
+  add_foreign_key "employees", "cooperatives"
   add_foreign_key "insurance_groups", "agreement_contracts", column: "contract_id"
   add_foreign_key "insurance_groups", "cooperatives"
   add_foreign_key "insurance_groups", "insurance_contracts"
+  add_foreign_key "registries", "cooperatives"
+  add_foreign_key "types", "cooperatives"
+  add_foreign_key "users", "cooperatives"
+  add_foreign_key "users", "departments"
+  add_foreign_key "users", "roles"
 end

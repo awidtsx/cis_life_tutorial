@@ -55,4 +55,13 @@ class InsuranceContract < ApplicationRecord
       contract_id: rate_contract.id
     )
   end
+  def self.dashboard_overview
+    select(
+    "COUNT(*) AS total_certificates",
+    "SUM(premium) AS total_premium",
+    "SUM(amount_covered) AS total_sum_assured",
+    "COUNT(CASE WHEN insured_id IS NOT NULL THEN 1 END) AS active_certificates"
+    ).take
+  end
+
 end

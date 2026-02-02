@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @registry %>
+
+<div>
+  <%= link_to "Edit this registry", edit_registry_path(@registry) %> |
+  <%= link_to "Back to registries", registries_path %>
+
+  <%= button_to "Destroy this registry", @registry, method: :delete %>
+</div>

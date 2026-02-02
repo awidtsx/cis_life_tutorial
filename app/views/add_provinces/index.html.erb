@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+<%= link_to "New add province", new_add_province_path %>
+<h1>Add provinces</h1>
+
+<div id="add_provinces">
+  <% @add_provinces.each do |add_province| %>
+    <%= render add_province %>
+    <p>
+      <%= link_to "Show this add province", add_province %>
+    </p>
+  <% end %>
+</div>
+
+

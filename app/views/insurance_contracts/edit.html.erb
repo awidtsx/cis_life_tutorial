@@ -1,10 +1,160 @@
-<h1>Editing insurance contract</h1>
+<div class="container mt-4">
+  <div class="mb-3">
+    <%= link_to "← Back to contract", [@insured, @insurance_contract], class: "text-decoration-none", style: "color: #CCCCCC;" %>
+  </div>
 
-<%= render "form", insurance_contract: @insurance_contract %>
+  <div class="card">
+    <div class="card-header text-white" style="background-color: #002C88;">
+      <h2 class="mb-0">Edit Insurance Contract</h2>
+      <small class="text-white-50">Contract #<%= @insurance_contract.id %></small>
+    </div>
+    <div class="card-body">
+      <div data-controller="premium">
+        <%= form_with(model: [@insured, @insurance_contract], local: true) do |f| %>
+          <% if @insurance_contract.errors.any? %>
+            <div class="alert alert-danger" role="alert">
+              <h4><%= pluralize(@insurance_contract.errors.count, "error") %> prohibited this insurance contract from being saved:</h4>
+              <ul class="mb-0">
+                <% @insurance_contract.errors.each do |error| %>
+                  <li><%= error.full_message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
 
-<br>
+          <!-- Insured Information (Read-only) -->
+          <div class="card mb-4" style="border: 2px solid #F9CB25;">
+            <div class="card-header" style="background-color: #F9CB25; color: #031249;">
+              <h5 class="mb-0 fw-bold">Insured Information</h5>
+            </div>
+            <div class="card-body">
+              <% if @insured.is_a?(Individual) %>
+                <p class="mb-2">
+                  <strong>Type:</strong> Individual<br>
+                  <strong>Name:</strong> <%= @insured.full_name %><br>
+                  <strong>Birth Date:</strong> <%= @insured.birth_date&.strftime("%B %d, %Y") %>
+                </p>
+              <% elsif @insured.is_a?(CoopMembership) %>
+                <p class="mb-2">
+                  <strong>Type:</strong> Cooperative Member<br>
+                  <strong>Cooperative:</strong> <%= @insured.cooperative&.name %><br>
+                  <strong>Member:</strong> <%= @insured.individual&.full_name %>
+                </p>
+              <% end %>
+            </div>
+          </div>
 
-<div>
-  <%= link_to "Show this insurance contract", @insurance_contract %> |
-  <%= link_to "Back to insurance contracts", insurance_contracts_path %>
+          <div class="row">
+            <div class="col-md-6">
+              <% if @insured.is_a?(Individual) %>
+                <!-- Individual: Show custom rate input -->
+                <div class="field mb-3">
+                  <%= f.label :agreement_id, "Agreement Contract", class: "form-label fw-bold" %>
+                  <%= f.select :agreement_id,
+                        grouped_options_for_select(
+                          @individual_contracts.group_by { |c| c.insurance_product&.name }.map do |product_name, contracts|
+                            [
+                              product_name || 'No Product',
+                              contracts.map { |c| ["Contract ##{c.id} - #{c.insurance_product&.name}", c.id] }
+                            ]
+                          end,
+                          @insurance_contract.agreement_id
+                        ),
+                        { prompt: "Select an agreement contract" },
+                        { id: "agreement_contract_select", class: "form-select", required: true } %>
+                  <%= f.hidden_field :agreement_type, value: "Agreement::Contract" %>
+                  <small class="form-text text-muted">Agreement contract for this insurance</small>
+                </div>
+
+                <div class="field mb-3">
+                  <%= f.label :custom_rate, "Rate (Manual Entry)", class: "form-label fw-bold" %>
+                  <%= number_field_tag 'insurance_contract[custom_rate]', @insurance_contract.rate, 
+                      id: "custom_rate_input", 
+                      class: "form-control", 
+                      step: 0.01, 
+                      min: 0, 
+                      placeholder: "Enter rate manually",
+                      required: true,
+                      data: { premium_target: "rate", action: "input->premium#recalculate" } %>
+                  <small class="form-text text-muted">Current rate: <%= @insurance_contract.rate %>%</small>
+                </div>
+              <% else %>
+                <!-- CoopMembership: Show rate selector -->
+                <div class="field mb-3">
+                  <%= f.label :agreement_id, "Rate", class: "form-label fw-bold" %>
+                  <%= f.select :agreement_id,
+                        grouped_options_for_select(
+                          @available_rates.group_by { |r| "Age #{r.age_from}-#{r.age_to}" }.map do |age_range, rates|
+                            [
+                              age_range,
+                              rates.map { |r| ["Rate: #{r.rate}% (#{number_to_currency(r.min_amount)} - #{number_to_currency(r.max_amount)})", r.id, { 'data-rate' => r.rate }] }
+                            ]
+                          end,
+                          @insurance_contract.agreement_id
+                        ),
+                        { prompt: "Select a rate" },
+                        { id: "rate_select", class: "form-select", required: true, data: { premium_target: "rate", action: "change->premium#recalculate" } } %>
+                  <%= f.hidden_field :agreement_type, value: "Agreement::Rate" %>
+                  <small class="form-text text-muted">Select the appropriate rate</small>
+                </div>
+              <% end %>
+
+              <div class="mb-3">
+                <%= f.label :age, class: "form-label fw-bold" %>
+                <%= f.number_field :age, class: "form-control", required: true, step: 1, min: 0 %>
+                <small class="form-text text-muted">Insured's age at time of contract</small>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <%= f.label :amount_covered, class: "form-label fw-bold" %>
+                <%= f.number_field :amount_covered, class: "form-control", required: true, step: 0.01, min: 0, 
+                    data: { premium_target: "amount", action: "input->premium#recalculate" } %>
+                <small class="form-text text-muted">Current: <%= number_to_currency(@insurance_contract.amount_covered) %></small>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :effectivity, class: "form-label fw-bold" %>
+                <%= f.date_field :effectivity, class: "form-control", required: true,
+                    data: { premium_target: "effectivity", action: "change->premium#recalculate" } %>
+                <small class="form-text text-muted">Contract start date</small>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :expiry, class: "form-label fw-bold" %>
+                <%= f.date_field :expiry, class: "form-control", required: true,
+                    data: { premium_target: "expiry", action: "change->premium#recalculate" } %>
+                <small class="form-text text-muted">Contract end date</small>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :premium, "Premium (Calculated)", class: "form-label fw-bold" %>
+                <div class="p-3 rounded" style="background-color: #F9CB25;">
+                  <p class="fs-5 fw-bold mb-0" style="color: #031249;" data-premium-target="premiumPreview">
+                    <%= number_to_currency(@insurance_contract.premium) %>
+                  </p>
+                </div>
+                <%= f.hidden_field :premium, value: @insurance_contract.premium, data: { premium_target: "premiumInput" } %>
+                <small class="form-text text-muted">Premium recalculates automatically</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert" style="background-color: #FDFDFD; border: 1px solid #CCCCCC; color: #031249;" role="alert">
+            <strong>Warning:</strong> Changing the amount covered, dates, or rate will automatically recalculate the premium.
+          </div>
+
+          <div class="mt-4">
+            <%= f.submit "Update Insurance Contract", class: "btn text-white", style: "background-color: #002C88;" %>
+            <%= link_to "Cancel", [@insured, @insurance_contract], class: "btn text-white", style: "background-color: #A80F21;" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <%= link_to "View details", [@insured, @insurance_contract], class: "text-decoration-none" %>
+  </div>
 </div>
