@@ -1,0 +1,2 @@
+module Agreement::PerilsHelper
+end

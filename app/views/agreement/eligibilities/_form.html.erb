@@ -1,0 +1,77 @@
+<%= form_with(model: agreement_eligibility) do |form| %>
+  <% if agreement_eligibility.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(agreement_eligibility.errors.count, "error") %> prohibited this agreement_eligibility from being saved:</h2>
+
+      <ul>
+        <% agreement_eligibility.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :eligibility_title, style: "display: block" %>
+    <%= form.text_field :eligibility_title %>
+  </div>
+
+  <div>
+    <%= form.label :dependent, style: "display: block" %>
+    <%= form.check_box :dependent %>
+  </div>
+
+  <div>
+    <%= form.label :evidence_limit, style: "display: block" %>
+    <%= form.text_field :evidence_limit %>
+  </div>
+
+  <div>
+    <%= form.label :medical_limit, style: "display: block" %>
+    <%= form.text_field :medical_limit %>
+  </div>
+
+  <div>
+    <%= form.label :contestability, style: "display: block" %>
+    <%= form.number_field :contestability %>
+  </div>
+
+  <div>
+    <%= form.label :min_entry, style: "display: block" %>
+    <%= form.number_field :min_entry %>
+  </div>
+
+  <div>
+    <%= form.label :max_entry, style: "display: block" %>
+    <%= form.number_field :max_entry %>
+  </div>
+
+  <div>
+    <%= form.label :exit, style: "display: block" %>
+    <%= form.number_field :exit %>
+  </div>
+
+  <div>
+    <%= form.label :service, style: "display: block" %>
+    <%= form.text_field :service %>
+  </div>
+
+  <div>
+    <%= form.label :commission, style: "display: block" %>
+    <%= form.text_field :commission %>
+  </div>
+
+  <div>
+    <%= form.label :min_confinement, style: "display: block" %>
+    <%= form.number_field :min_confinement %>
+  </div>
+
+  <div>
+    <%= form.label :max_confinement, style: "display: block" %>
+    <%= form.number_field :max_confinement %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

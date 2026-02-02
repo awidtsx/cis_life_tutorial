@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  eligibility_title: MyString
+  dependent: false
+  evidence_limit: 9.99
+  medical_limit: 9.99
+  contestability: 1
+  min_entry: 1
+  max_entry: 1
+  exit: 1
+  service: 9.99
+  commission: 9.99
+  min_confinement: 1
+  max_confinement: 1
+
+two:
+  eligibility_title: MyString
+  dependent: false
+  evidence_limit: 9.99
+  medical_limit: 9.99
+  contestability: 1
+  min_entry: 1
+  max_entry: 1
+  exit: 1
+  service: 9.99
+  commission: 9.99
+  min_confinement: 1
+  max_confinement: 1

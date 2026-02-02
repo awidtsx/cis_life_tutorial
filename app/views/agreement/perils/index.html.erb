@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Perils</h1>
+
+<div id="agreement_perils">
+  <% @agreement_perils.each do |agreement_peril| %>
+    <%= render agreement_peril %>
+    <p>
+      <%= link_to "Show this peril", agreement_peril %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New peril", new_agreement_peril_path %>

@@ -118,12 +118,12 @@
       <%= render "dashboard/system_module_card",
           title: "Insurance",
           color: "#002C88",
-          items: [{label: "Certificates", path: insurance_contracts_path}, {label: "Group Contracts", path: insurance_groups_path}, {label: "Perils", path: insurance_contracts_path}, {label: "Products", path: insurance_products_path}] %>
+          items: [{label: "Certificates", path: insurance_contracts_path}, {label: "Group Contracts", path: insurance_groups_path}, {label: "Perils", path: agreement_perils_path}, {label: "Products", path: insurance_products_path}] %>
 
       <%= render "dashboard/system_module_card",
           title: "Agreement",
           color: "#031249",
-          items: [{label: "Contracts", path: agreement_contracts_path}, {label: "Coverages", path: agreement_contracts_path}, {label: "Eligibilities", path: agreement_rates_path}, {label: "Relationships", path: agreement_contracts_path}, {label: "Rates", path: agreement_rates_path}] %>
+          items: [{label: "Contracts", path: agreement_contracts_path}, {label: "Coverages", path: agreement_perils_path}, {label: "Eligibilities", path: agreement_eligibilities_path}, {label: "Relationships", path: relationships_path}, {label: "Rates", path: agreement_rates_path}] %>
 
       <%= render "dashboard/system_module_card",
           title: "User Management",
@@ -143,7 +143,7 @@
       <%= render "dashboard/system_module_card",
           title: "General",
           color: "#031249",
-          items: [{label: "Individuals", path: individuals_path}, {label: "Dependents", path: insurance_contracts_path}, {label: "Relationship Types", path: insurance_contracts_path}, {label: "Departments", path: departments_path}, {label: "Branches", path: branches_path}, {label: "Territories", path: insurance_contracts_path}] %>
+          items: [{label: "Individuals", path: individuals_path}, {label: "Dependents", path: dependents_path}, {label: "Relationship Types", path: relationships_path}, {label: "Departments", path: departments_path}, {label: "Branch Offices", path: branch_offices_path}, {label: "Territories", path: territories_path}] %>
     </div>
   </div>
 

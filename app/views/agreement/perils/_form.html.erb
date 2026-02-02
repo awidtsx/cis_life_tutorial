@@ -1,0 +1,47 @@
+<%= form_with(model: agreement_peril) do |form| %>
+  <% if agreement_peril.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(agreement_peril.errors.count, "error") %> prohibited this agreement_peril from being saved:</h2>
+
+      <ul>
+        <% agreement_peril.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :eligibility_id, style: "display: block" %>
+    <%= form.text_field :eligibility_id %>
+  </div>
+
+  <div>
+    <%= form.label :peril, style: "display: block" %>
+    <%= form.text_field :peril %>
+  </div>
+
+  <div>
+    <%= form.label :coverage, style: "display: block" %>
+    <%= form.text_field :coverage %>
+  </div>
+
+  <div>
+    <%= form.label :premium, style: "display: block" %>
+    <%= form.text_field :premium %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.text_field :description %>
+  </div>
+
+  <div>
+    <%= form.label :acronym, style: "display: block" %>
+    <%= form.text_field :acronym %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

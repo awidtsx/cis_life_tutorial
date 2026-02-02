@@ -1,0 +1,12 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @agreement_eligibility %>
+<%= link_to "Add Peril",
+    new_agreement_eligibility_peril_path(@eligibility),
+    class: "btn btn-primary" %>
+<div>
+  <%= link_to "Edit this eligibility", edit_agreement_eligibility_path(@agreement_eligibility) %> |
+  <%= link_to "Back to eligibilities", agreement_eligibilities_path %>
+
+  <%= button_to "Destroy this eligibility", @agreement_eligibility, method: :delete %>
+</div>

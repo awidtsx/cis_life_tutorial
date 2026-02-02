@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @agreement_peril %>
+
+<div>
+  <%= link_to "Edit this peril", edit_agreement_peril_path(@agreement_peril) %> |
+  <%= link_to "Back to perils", agreement_perils_path %>
+
+  <%= button_to "Destroy this peril", @agreement_peril, method: :delete %>
+</div>

@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Eligibilities</h1>
+
+<div id="agreement_eligibilities">
+  <% @agreement_eligibilities.each do |agreement_eligibility| %>
+    <%= render agreement_eligibility %>
+    <p>
+      <%= link_to "Show this eligibility", agreement_eligibility %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New eligibility", new_agreement_eligibility_path %>

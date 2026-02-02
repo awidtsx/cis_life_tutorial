@@ -1,0 +1,2 @@
+module Agreement::EligibilitiesHelper
+end

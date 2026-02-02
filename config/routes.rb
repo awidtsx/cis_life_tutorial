@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resources :dependents
+  resources :relationships
+  resources :branch_offices
+  resources :territories
   resources :producers
   resources :departments
   resources :roles
@@ -26,6 +30,10 @@ Rails.application.routes.draw do
         resources :insurance_contracts
   end
   namespace :agreement do
+    resources :perils
+    resources :eligibilities do
+      resources :perils, only: [:new, :create]
+    end
     resources :rates do
       get 'get_contract', on: :collection
     end
