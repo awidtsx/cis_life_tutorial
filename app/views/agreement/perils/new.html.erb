@@ -1,9 +1,36 @@
 <h1>New peril</h1>
 
-<%= render "form", agreement_peril: @agreement_peril %>
+<%= form_with(model: [@agreement_eligibility, @agreement_peril], 
+              url: agreement_eligibility_perils_path(@agreement_eligibility), 
+              local: true) do |f| %>
+
+  <div class="mb-3">
+    <%= f.label :peril, class: "form-label" %>
+    <%= f.text_field :peril, autofocus: true, class: "form-control", required: true %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :coverage, class: "form-label" %>
+    <%= f.number_field :coverage, class: "form-control", required: true %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :premium, class: "form-label" %>
+    <%= f.number_field :premium, class: "form-control", required: true %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :description, class: "form-label" %>
+    <%= f.text_field :description, class: "form-control", required: true %>
+  </div>
+  <div class="mb-3">
+    <%= f.label :acronym, class: "form-label" %>
+    <%= f.text_field :acronym, class: "form-control", required: true %>
+  </div>
+  <div class="mb-3">
+    <%= f.submit "Create Peril", class: "btn btn-primary" %>
+  </div>
+<% end %>
 
 <br>
 
 <div>
-  <%= link_to "Back to perils", agreement_perils_path %>
+  <%= link_to "Back to perils", agreement_eligibility_perils_path(@agreement_eligibility) %>
 </div>

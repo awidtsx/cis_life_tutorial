@@ -1,7 +1,34 @@
 <h1>New relationship</h1>
 
-<%= render "form", relationship: @relationship %>
 
+<%= form_with(model: @relationship, local: true) do |f| %>
+<div class="mb-3">
+    <%= f.label :relationship, class: "form-label" %>
+    <%= f.text_field :relationship, autofocus: true, class: "form-control", required: true %>
+</div>
+<div class="mb-3">
+<%= f.label :agreement_id, "Agreement Contract", class: "form-label" %>
+
+
+  <%= f.select :agreement_id,
+                        grouped_options_for_select(
+                          @individual_contracts.group_by { |c| c.insurance_product&.name }.map do |product_name, contracts|
+                            [
+                              product_name || 'No Product',
+                              contracts.map { |c| ["Contract ##{c.id} - #{c.insurance_product&.name}", c.id] }
+                            ]
+                          end,
+                          @insurance_contract.agreement_id
+                        ),
+                        { prompt: "Select an agreement contract" },
+                        { id: "agreement_contract_select", class: "form-select", required: true } %>
+                  <%= f.hidden_field :agreement_type, value: "Agreement::Contract" %>
+</div>
+<div class="mb-3">
+    <%= f.submit "Create Relationship", class: "btn btn-primary" %>
+
+</div>
+<% end %>
 <br>
 
 <div>

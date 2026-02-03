@@ -30,10 +30,10 @@ Rails.application.routes.draw do
         resources :insurance_contracts
   end
   namespace :agreement do
-    resources :perils
     resources :eligibilities do
-      resources :perils, only: [:new, :create]
+    resources :perils, only: [:new, :create, :index, :edit, :update, :destroy, :show]
     end
+    resources :perils, only: [:index]
     resources :rates do
       get 'get_contract', on: :collection
     end

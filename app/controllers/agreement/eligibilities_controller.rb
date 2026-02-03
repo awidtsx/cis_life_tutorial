@@ -8,6 +8,7 @@ class Agreement::EligibilitiesController < ApplicationController
 
   # GET /agreement/eligibilities/1 or /agreement/eligibilities/1.json
   def show
+    @agreement_eligibility = Agreement::Eligibility.find(params[:id])
   end
 
   # GET /agreement/eligibilities/new
