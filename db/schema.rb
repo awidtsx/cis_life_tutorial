@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_02_033614) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_05_030605) do
   create_table "add_barangays", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.bigint "add_municipal_id", null: false
@@ -208,6 +208,13 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_02_033614) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "permissions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "action", default: "0", null: false
+    t.string "subject"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "producers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
@@ -226,10 +233,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_02_033614) do
 
   create_table "relationships", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "relationship"
-    t.bigint "contract_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["contract_id"], name: "index_relationships_on_contract_id"
+    t.string "agreement_type"
+    t.integer "agreement_id"
+    t.index ["agreement_type", "agreement_id"], name: "index_relationships_on_agreement_type_and_agreement_id"
+  end
+
+  create_table "rolepermissions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "role_id", null: false
+    t.bigint "permission_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["permission_id"], name: "index_rolepermissions_on_permission_id"
+    t.index ["role_id"], name: "index_rolepermissions_on_role_id"
   end
 
   create_table "roles", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -304,7 +321,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_02_033614) do
   add_foreign_key "insurance_groups", "cooperatives"
   add_foreign_key "insurance_groups", "insurance_contracts"
   add_foreign_key "registries", "cooperatives"
-  add_foreign_key "relationships", "agreement_contracts", column: "contract_id"
+  add_foreign_key "rolepermissions", "permissions"
+  add_foreign_key "rolepermissions", "roles"
   add_foreign_key "types", "cooperatives"
   add_foreign_key "users", "cooperatives"
   add_foreign_key "users", "departments"

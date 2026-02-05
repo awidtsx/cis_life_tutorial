@@ -5,8 +5,18 @@
   </p>
 
   <p>
-    <strong>Contract:</strong>
-    <%= relationship.contract_id %>
+    <strong>Agreement Type:</strong>
+    <%= relationship.agreement_type %>
   </p>
 
+  <p>
+    <strong>Agreement Contract:</strong>
+    <% if relationship.agreement.is_a?(Agreement::Contract) %>
+      Contract #<%= relationship.agreement.id %> - 
+      <%= relationship.agreement.insurance_product&.name %> 
+      (<%= relationship.agreement.contractable_type %>: <%= relationship.agreement.contractable_name %>)
+    <% else %>
+      <%= relationship.agreement_id %>
+    <% end %>
+  </p>
 </div>

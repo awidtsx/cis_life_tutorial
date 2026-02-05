@@ -3,6 +3,9 @@
 <%= render @role %>
 
 <div>
+<%= link_to "Edit Permissions",
+            edit_role_permissions_path(@role),
+            class: "btn btn-primary" %>
   <%= link_to "Edit this role", edit_role_path(@role) %> |
   <%= link_to "Back to roles", roles_path %>
 

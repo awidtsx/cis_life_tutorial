@@ -1,11 +1,15 @@
 Rails.application.routes.draw do
+  get 'role_permissions/edit'
+  get 'role_permissions/update'
   resources :dependents
   resources :relationships
   resources :branch_offices
   resources :territories
   resources :producers
   resources :departments
-  resources :roles
+  resources :roles do
+    resource :permissions, only: [:edit, :update], controller: "role_permissions"
+  end
   resources :types
   resources :employees
   resources :registries

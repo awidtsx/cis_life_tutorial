@@ -13,10 +13,13 @@ class RelationshipsController < ApplicationController
   # GET /relationships/new
   def new
     @relationship = Relationship.new
+    # Load all agreement contracts for the select dropdown
+    @agreement_contracts = Agreement::Contract.includes(:insurance_product, :contractable).all
   end
 
   # GET /relationships/1/edit
   def edit
+    @agreement_contracts = Agreement::Contract.includes(:insurance_product, :contractable).all
   end
 
   # POST /relationships or /relationships.json
@@ -28,6 +31,7 @@ class RelationshipsController < ApplicationController
         format.html { redirect_to @relationship, notice: "Relationship was successfully created." }
         format.json { render :show, status: :created, location: @relationship }
       else
+        @agreement_contracts = Agreement::Contract.includes(:insurance_product, :contractable).all
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @relationship.errors, status: :unprocessable_entity }
       end
@@ -41,6 +45,7 @@ class RelationshipsController < ApplicationController
         format.html { redirect_to @relationship, notice: "Relationship was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @relationship }
       else
+        @agreement_contracts = Agreement::Contract.includes(:insurance_product, :contractable).all
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @relationship.errors, status: :unprocessable_entity }
       end
@@ -59,14 +64,12 @@ class RelationshipsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    # 
-    
     def set_relationship
       @relationship = Relationship.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def relationship_params
-      params.require(:relationship).permit(:relationship, :contract_id)
+      params.require(:relationship).permit(:relationship, :agreement_id, :agreement_type)
     end
 end
