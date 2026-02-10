@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_05_054232) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_05_064933) do
   create_table "add_barangays", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.bigint "add_municipal_id", null: false
@@ -212,10 +212,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_05_054232) do
     t.string "subject"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "create", default: false, null: false
-    t.boolean "read", default: false, null: false
-    t.boolean "update", default: false, null: false
-    t.boolean "delete", default: false, null: false
+    t.boolean "can_create", default: false, null: false
+    t.boolean "can_read", default: false, null: false
+    t.boolean "can_update", default: false, null: false
+    t.boolean "can_delete", default: false, null: false
+    t.bigint "role_id", null: false
+    t.index ["role_id"], name: "index_permissions_on_role_id"
   end
 
   create_table "producers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -241,15 +243,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_05_054232) do
     t.string "agreement_type"
     t.integer "agreement_id"
     t.index ["agreement_type", "agreement_id"], name: "index_relationships_on_agreement_type_and_agreement_id"
-  end
-
-  create_table "rolepermissions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "role_id", null: false
-    t.bigint "permission_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["permission_id"], name: "index_rolepermissions_on_permission_id"
-    t.index ["role_id"], name: "index_rolepermissions_on_role_id"
   end
 
   create_table "roles", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -324,8 +317,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_05_054232) do
   add_foreign_key "insurance_groups", "cooperatives"
   add_foreign_key "insurance_groups", "insurance_contracts"
   add_foreign_key "registries", "cooperatives"
-  add_foreign_key "rolepermissions", "permissions"
-  add_foreign_key "rolepermissions", "roles"
   add_foreign_key "types", "cooperatives"
   add_foreign_key "users", "cooperatives"
   add_foreign_key "users", "departments"

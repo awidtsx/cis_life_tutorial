@@ -1,2 +1,50 @@
-<h1>Permissions#edit</h1>
-<p>Find me in app/views/permissions/edit.html.erb</p>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Edit Permissions for <%= @role.name %></h2>
+        <%= link_to "Back to Roles", roles_path, class: "btn btn-secondary" %>
+      </div>
+
+      <%= form_with url: role_permissions_path(@role), method: :patch, local: true do |f| %>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Subject</th>
+                <th class="text-center">Create</th>
+                <th class="text-center">Read</th>
+                <th class="text-center">Update</th>
+                <th class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @permissions.each do |permission| %>
+                <tr>
+                  <td><strong><%= permission.subject.titleize %></strong></td>
+                  <td class="text-center">
+                    <%= check_box_tag "permissions[#{permission.id}][can_create]", "1", permission.can_create, class: "form-check-input" %>
+                  </td>
+                  <td class="text-center">
+                    <%= check_box_tag "permissions[#{permission.id}][can_read]", "1", permission.can_read, class: "form-check-input" %>
+                  </td>
+                  <td class="text-center">
+                    <%= check_box_tag "permissions[#{permission.id}][can_update]", "1", permission.can_update, class: "form-check-input" %>
+                  </td>
+                  <td class="text-center">
+                    <%= check_box_tag "permissions[#{permission.id}][can_delete]", "1", permission.can_delete, class: "form-check-input" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-3">
+          <%= f.submit "Update Permissions", class: "btn btn-primary" %>
+          <%= link_to "Cancel", roles_path, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

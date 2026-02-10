@@ -7,4 +7,6 @@ class User < ApplicationRecord
   belongs_to :cooperative, optional: true
   belongs_to :department, optional: true
   belongs_to :role, optional: true
+  delegate :permissions, to: :role
+
 end
