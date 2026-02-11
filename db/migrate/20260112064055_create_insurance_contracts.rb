@@ -5,10 +5,11 @@ class CreateInsuranceContracts < ActiveRecord::Migration[7.1]
       t.references :insured, polymorphic: true, null: false
       t.integer :age
       t.decimal :amount_covered
-      t.string :premium
+      t.decimal :premium
       t.date :effectivity
       t.date :expiry
-
+      t.references :agreement, polymorphic: true, null: true
+      t.decimal :rate
       t.timestamps
     end
   end

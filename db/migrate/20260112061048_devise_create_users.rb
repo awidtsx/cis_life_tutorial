@@ -14,13 +14,23 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.1]
       ## Rememberable
       t.datetime :remember_created_at
 
-      ## Trackable
-      # t.integer  :sign_in_count, default: 0, null: false
-      # t.datetime :current_sign_in_at
-      # t.datetime :last_sign_in_at
-      # t.string   :current_sign_in_ip
-      # t.string   :last_sign_in_ip
 
+      t.integer  :sign_in_count, default: 0, null: false
+      t.datetime :current_sign_in_at
+      t.datetime :last_sign_in_at
+      t.string   :current_sign_in_ip
+      t.string   :last_sign_in_ip
+      t.string :first_name
+      t.string :last_name
+      t.date :birthdate
+      t.string :gender
+      t.string :designation
+      t.references :branch, null: true, foreign_key: true
+      t.references :cooperative, null: true, foreign_key: true
+      t.references :department, null: true, foreign_key: true
+      t.references :role, null: false, foreign_key: true
+      t.boolean :active, default: true
+      
       ## Confirmable
       # t.string   :confirmation_token
       # t.datetime :confirmed_at

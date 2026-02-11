@@ -23,15 +23,19 @@
                 <tr>
                   <td><strong><%= permission.subject.titleize %></strong></td>
                   <td class="text-center">
+                    <%= hidden_field_tag "permissions[#{permission.id}][can_create]", "0" %>
                     <%= check_box_tag "permissions[#{permission.id}][can_create]", "1", permission.can_create, class: "form-check-input" %>
                   </td>
                   <td class="text-center">
+                    <%= hidden_field_tag "permissions[#{permission.id}][can_read]", "0" %>
                     <%= check_box_tag "permissions[#{permission.id}][can_read]", "1", permission.can_read, class: "form-check-input" %>
                   </td>
                   <td class="text-center">
+                    <%= hidden_field_tag "permissions[#{permission.id}][can_update]", "0" %>
                     <%= check_box_tag "permissions[#{permission.id}][can_update]", "1", permission.can_update, class: "form-check-input" %>
                   </td>
                   <td class="text-center">
+                    <%= hidden_field_tag "permissions[#{permission.id}][can_delete]", "0" %>
                     <%= check_box_tag "permissions[#{permission.id}][can_delete]", "1", permission.can_delete, class: "form-check-input" %>
                   </td>
                 </tr>

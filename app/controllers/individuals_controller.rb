@@ -1,4 +1,5 @@
 class IndividualsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_individual, only: %i[ show edit update destroy ]
 
 
@@ -6,6 +7,7 @@ class IndividualsController < ApplicationController
   # GET /individuals or /individuals.json
   def index
     @individuals = Individual.all
+    authorize! :read, @individuals
   end
 
   # GET /individuals/1 or /individuals/1.json
@@ -15,10 +17,12 @@ class IndividualsController < ApplicationController
   # GET /individuals/new
   def new
     @individual = Individual.new
+    authorize! :create, @individual
   end
 
   # GET /individuals/1/edit
   def edit
+    authorize! :update, Individual
   end
 
   # POST /individuals or /individuals.json
@@ -51,6 +55,7 @@ class IndividualsController < ApplicationController
 
   # DELETE /individuals/1 or /individuals/1.json
   def destroy
+    authorize! :update, Individual
     @individual.destroy!
 
     respond_to do |format|
